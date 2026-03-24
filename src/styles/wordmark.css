@@ -1,0 +1,82 @@
+/* ---- WORDMARK SCENE (Scene 3) ---- */
+
+.wordmark-scene {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+}
+
+.wordmark-scene__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(16px, 3vw, 32px);
+  padding: 2rem;
+}
+
+/* The exi + logo + n row */
+.wordmark-scene__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 0.8vw, 12px);
+}
+
+/* "exi" — scales based on viewport */
+.wordmark-scene__left {
+  height: clamp(50px, 10vw, 140px);
+  width: auto;
+}
+
+/* logo-solid sits between exi and n, sized to match letter height */
+.wordmark-scene__logo {
+  height: clamp(38px, 7.5vw, 105px);
+  width: auto;
+  aspect-ratio: 882.52 / 501.54;
+}
+
+.wordmark-scene__logo svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* "n" — matches exi proportions */
+.wordmark-scene__right {
+  height: clamp(38px, 7.5vw, 105px);
+  width: auto;
+  /* align baseline with exi — n is shorter (125.28 vs 166.41) */
+  align-self: flex-end;
+  margin-bottom: clamp(2px, 0.3vw, 5px);
+}
+
+/* Tagline */
+.wordmark-scene__tagline {
+  height: clamp(14px, 2.8vw, 42px);
+  width: auto;
+  max-width: 90vw;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .wordmark-scene__left {
+    height: clamp(36px, 12vw, 60px);
+  }
+
+  .wordmark-scene__logo {
+    height: clamp(28px, 9vw, 48px);
+  }
+
+  .wordmark-scene__right {
+    height: clamp(28px, 9vw, 48px);
+  }
+
+  .wordmark-scene__tagline {
+    height: clamp(10px, 3.5vw, 20px);
+  }
+}

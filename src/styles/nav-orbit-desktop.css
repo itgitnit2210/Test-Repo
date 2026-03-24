@@ -1,0 +1,81 @@
+.nav-orbit-desktop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.nav-orbit-desktop__svg {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  height: 60%;
+  width: auto;
+  transform: translateY(-50%) translateX(50%);
+  pointer-events: none;
+}
+
+.nav-orbit-desktop__svg [data-nav-item] {
+  pointer-events: auto;
+}
+
+.nav-orbit-desktop__svg [data-nav-item]:hover text {
+  fill: #fff;
+}
+
+.nav-orbit-desktop__trigger {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%) scale(0);
+  transform-origin: right center;
+  width: clamp(38px, 3.5vw, 55px);
+  height: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  padding: 0;
+  z-index: 12;
+}
+
+.nav-orbit-desktop__trigger-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.nav-orbit-desktop__trigger-text {
+  position: absolute;
+  top: 50%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: clamp(9px, 0.7vw, 13px);
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+  color: #fff;
+  text-transform: uppercase;
+  pointer-events: none;
+  writing-mode: vertical-lr;
+  text-orientation: upright;
+}
+
+.nav-orbit-desktop__trigger:hover .nav-orbit-desktop__trigger-text {
+  color: #000;
+}
+
+@media (max-width: 1024px) {
+  .nav-orbit-desktop__svg { height: 55%; }
+}
+
+@media (max-width: 768px) {
+  .nav-orbit-desktop__svg { height: 45%; }
+  .nav-orbit-desktop__trigger { width: clamp(32px, 5vw, 42px); }
+  .nav-orbit-desktop__trigger-text { font-size: 8px; }
+}
