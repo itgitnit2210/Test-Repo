@@ -7,6 +7,8 @@ import Particles from "./Particles";
 import LogoOutline from "./LogoOutline";
 import LogoSolid from "./LogoSolid";
 import NavOrbit from "./NavOrbit";
+import ImageCollage from "./ImageCollage";
+
 
 const ICONS = [
   { name: "icon-beetle",       x:  6.5, y: 28.0, w: 28, h: 34 },
@@ -19,14 +21,6 @@ const ICONS = [
   { name: "icon-caterpillar",  x: 80.0, y: 72.0, w: 30, h: 32 },
   { name: "icon-search",       x: 91.0, y: 55.0, w: 28, h: 28 },
 ];
-
-function getResponsiveValues() {
-  const w = window.innerWidth;
-  if (w <= 480) return { shiftX: -0.18, scale: 0.55 };
-  if (w <= 768) return { shiftX: -0.22, scale: 0.52 };
-  if (w <= 1024) return { shiftX: -0.28, scale: 0.50 };
-  return { shiftX: -0.32, scale: 0.48 };
-}
 
 /**
  * Wait for an element to appear in the DOM.
@@ -60,6 +54,14 @@ export default function IntroScene() {
   const taglineRef    = useRef<HTMLImageElement>(null);
   const logoTargetRef = useRef<HTMLDivElement>(null);
   const shiftGroupRef = useRef<HTMLDivElement>(null);
+  const iDotRef       = useRef<HTMLDivElement>(null);
+  const callIt1Ref    = useRef<HTMLDivElement>(null);
+  const capRef        = useRef<HTMLDivElement>(null);
+  const callIt2Ref    = useRef<HTMLDivElement>(null);
+  const possRef       = useRef<HTMLDivElement>(null);
+  const videoWrapRef  = useRef<HTMLDivElement>(null);
+  const videoRef      = useRef<HTMLVideoElement>(null);
+  const collageRef    = useRef<HTMLDivElement>(null);
 
   const [loading, setLoading] = useState(true);
 
@@ -78,9 +80,18 @@ export default function IntroScene() {
     const tagline    = taglineRef.current;
     const logoTarget = logoTargetRef.current;
     const shiftGroup = shiftGroupRef.current;
+    const iDot       = iDotRef.current;
+    const callIt1    = callIt1Ref.current;
+    const cap        = capRef.current;
+    const callIt2    = callIt2Ref.current;
+    const poss       = possRef.current;
+    const videoWrap  = videoWrapRef.current;
+    const video      = videoRef.current;
+    const collage    = collageRef.current;
     if (!section || !outline || !solid || !logoWrap || !iconsDiv ||
         !wordmark || !left || !right || !tagline || !logoTarget ||
-        !shiftGroup) return;
+        !shiftGroup || !iDot || !callIt1 || !cap || !callIt2 || !poss ||
+        !videoWrap || !video || !collage) return;
 
     const particlesWrap = section.querySelector(".intro__particles") as HTMLElement;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -91,6 +102,10 @@ export default function IntroScene() {
     gsap.set(left, { x: -100, opacity: 0 });
     gsap.set(right, { x: 100, opacity: 0 });
     gsap.set(tagline, { y: 30, opacity: 0 });
+    gsap.set(iDot, { opacity: 0 });
+    gsap.set([callIt1, cap, callIt2, poss], { opacity: 0 });
+    gsap.set(videoWrap, { opacity: 0, scale: 0 });
+    gsap.set(collage, { opacity: 0, scale: 0.5 });
 
     setLoading(false);
 
@@ -143,6 +158,8 @@ export default function IntroScene() {
 
     const scrollTl = gsap.timeline();
 
+    // ── Scenes 1–3: UNTOUCHED from your working code ──
+
     scrollTl.to(logoWrap, {
       width: () => logoTarget.offsetWidth, height: () => logoTarget.offsetHeight,
       x: () => { const f = logoWrap.getBoundingClientRect(); const t = logoTarget.getBoundingClientRect(); return t.left - f.left + (t.width - f.width) / 2; },
@@ -158,21 +175,232 @@ export default function IntroScene() {
     if (particlesWrap) scrollTl.to(particlesWrap, { opacity: 0, duration: 0.10, ease: "power2.in" }, 0.40);
     scrollTl.to(iconEls, { opacity: 0, duration: 0.08, stagger: 0.005 }, 0.40);
 
-    scrollTl.to(shiftGroup, {
-      x: () => {
-        const { shiftX } = getResponsiveValues();
-        return window.innerWidth * shiftX;
-      },
-      scale: () => getResponsiveValues().scale,
-      transformOrigin: "center center",
-      duration: 0.20,
-      ease: "power2.inOut",
-    }, 0.45);
+    // ── Wordmark hold ──
+    scrollTl.set({}, {}, 0.48);
 
-    scrollTl.set({}, {}, 1.0);
+    // ══════════════════════════════════════════════
+    // Scene 4: i-dot zoom to centered circle + text reveal
+    //
+    // 0.48–0.53: fade out wordmark, show i-dot overlay
+    // 0.48–0.72: dot drifts to center + scales to large circle
+    // 0.72–0.78: "Call it" (top) fades in
+    // 0.74–0.82: "capabilities" slides in from left
+    // 0.80–0.86: "Call it" (bottom) fades in
+    // 0.82–0.92: "possibilities" slides in from left
+    // 0.92–1.00: hold
+    // ══════════════════════════════════════════════
+
+    // Dot ratios within wordmark-left.svg (viewBox 0 0 284.4 166.41)
+    const DOT_CX = 268.02 / 284.4;
+    const DOT_CY = 15.77 / 166.41;
+    const DOT_W  = 32.24 / 284.4;
+    const DOT_H  = 31.89 / 166.41;
+
+    function getDotPos() {
+      const lr = left!.getBoundingClientRect();
+      const sr = section!.getBoundingClientRect();
+      return {
+        w: lr.width * DOT_W,
+        h: lr.height * DOT_H,
+        cx: lr.left + lr.width * DOT_CX - sr.left,
+        cy: lr.top  + lr.height * DOT_CY - sr.top,
+      };
+    }
+
+    // Oversample for crisp rendering
+    const OVERSAMPLE = 10;
+
+    // Target circle size: 55% of the smaller viewport dimension
+    // so it never overflows on portrait (mobile) or landscape (desktop)
+    const CIRCLE_RATIO = 0.55;
+
+    // 4a. Snap i-dot overlay and show
+    scrollTl.set(iDot, {
+      width:    () => getDotPos().w * OVERSAMPLE,
+      height:   () => getDotPos().h * OVERSAMPLE,
+      left:     () => getDotPos().cx - (getDotPos().w * OVERSAMPLE) / 2,
+      top:      () => getDotPos().cy - (getDotPos().h * OVERSAMPLE) / 2,
+      xPercent: 0,
+      yPercent: 0,
+      scale:    1 / OVERSAMPLE,
+      opacity:  1,
+    }, 0.48);
+
+    // 4b. Fade out wordmark + nav
+    scrollTl.to(shiftGroup, { opacity: 0, duration: 0.05, ease: "power2.in" }, 0.48);
+
+    waitForElement(section, "[data-nav-trigger]").then(() => {
+      // Nav trigger stays visible — no fade out
+    });
+
+    // 4c. Drift to center
+    scrollTl.to(iDot, {
+      left: () => section.offsetWidth / 2,
+      top: () => section.offsetHeight / 2,
+      xPercent: -50,
+      yPercent: -50,
+      duration: 0.22,
+      ease: "power2.inOut",
+    }, 0.48);
+
+    // 4d. Scale to the centered circle size (not full screen)
+    scrollTl.to(iDot, {
+      scale: () => {
+        const dotSize = Math.max(iDot.offsetWidth, iDot.offsetHeight) / OVERSAMPLE || 30;
+        // Use the smaller dimension so circle fits on portrait and landscape
+        const smallerSide = Math.min(section.offsetWidth, section.offsetHeight);
+        const targetSize = smallerSide * CIRCLE_RATIO;
+        return (targetSize / dotSize) / OVERSAMPLE;
+      },
+      duration: 0.22,
+      ease: "power3.in",
+    }, 0.50);
+
+    // ── Text animations (Scene 4 text in) ──
+
+    // Set initial positions for text
+    gsap.set(callIt1, { y: 20, opacity: 0 });
+    gsap.set(cap,     { x: -60, opacity: 0 });
+    gsap.set(callIt2, { y: -20, opacity: 0 });
+    gsap.set(poss,    { x: -60, opacity: 0 });
+
+    // "Call it" top — fade in
+    scrollTl.to(callIt1, {
+      y: 0, opacity: 1, duration: 0.04, ease: "power2.out",
+    }, 0.58);
+
+    // "capabilities" — slide in from left
+    scrollTl.to(cap, {
+      x: 0, opacity: 1, duration: 0.05, ease: "power2.out",
+    }, 0.60);
+
+    // "Call it" bottom — fade in
+    scrollTl.to(callIt2, {
+      y: 0, opacity: 1, duration: 0.04, ease: "power2.out",
+    }, 0.64);
+
+    // "possibilities" — slide in from left
+    scrollTl.to(poss, {
+      x: 0, opacity: 1, duration: 0.05, ease: "power2.out",
+    }, 0.66);
+
+    // ── Scene 4 hold ──
+    scrollTl.set({}, {}, 0.74);
+
+    // ══════════════════════════════════════════════
+    // Scene 5: Text out → orange circle zooms bigger
+    // 0.74–0.78: text fades/slides out
+    // 0.76–0.84: circle scales up
+    // 0.84–0.86: hold (big orange circle alone)
+    // ══════════════════════════════════════════════
+
+    // 5a. Text out
+    scrollTl.to(callIt1, {
+      y: -30, opacity: 0, duration: 0.04, ease: "power2.in",
+    }, 0.74);
+
+    scrollTl.to(cap, {
+      x: -80, opacity: 0, duration: 0.05, ease: "power2.in",
+    }, 0.74);
+
+    scrollTl.to(callIt2, {
+      y: 30, opacity: 0, duration: 0.04, ease: "power2.in",
+    }, 0.76);
+
+    scrollTl.to(poss, {
+      x: -80, opacity: 0, duration: 0.05, ease: "power2.in",
+    }, 0.76);
+
+    // 5b. Orange circle zooms bigger
+    scrollTl.to(iDot, {
+      scale: () => {
+        const dotSize = Math.max(iDot.offsetWidth, iDot.offsetHeight) / OVERSAMPLE || 30;
+        const largerSide = Math.max(section.offsetWidth, section.offsetHeight);
+        return (largerSide * 0.70 / dotSize) / OVERSAMPLE;
+      },
+      duration: 0.08,
+      ease: "power2.inOut",
+    }, 0.76);
+
+    // ── Hold: big orange circle alone ──
+    scrollTl.set({}, {}, 0.86);
+
+    // ══════════════════════════════════════════════
+    // Scene 6: Video zooms in slowly over the orange circle
+    // 0.86–0.94: video scales from 0 to 1, covering the circle
+    // 0.94–0.96: hold with video visible
+    // ══════════════════════════════════════════════
+
+    // 6a. Video zooms in slowly
+    scrollTl.to(videoWrap, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.08,
+      ease: "sine.inOut",
+    }, 0.86);
+
+    // 6b. Start video playback
+    scrollTl.call(() => {
+      video.play().catch(() => {});
+    }, [], 0.88);
+
+    // ── Hold: video playing ──
+    scrollTl.set({}, {}, 0.96);
+
+    // ══════════════════════════════════════════════
+    // Scene 7: Video zooms out slowly, orange circle alone again
+    // 0.96–1.04: video shrinks back to center smoothly
+    // Then hold on orange circle
+    // ══════════════════════════════════════════════
+
+    // 7a. Video zooms out slowly
+    scrollTl.to(videoWrap, {
+      scale: 0,
+      opacity: 0,
+      duration: 0.08,
+      ease: "sine.inOut",
+    }, 0.96);
+
+    // 7b. Pause video
+    scrollTl.call(() => {
+      video.pause();
+    }, [], 1.03);
+
+    // Hold at end (orange circle alone)
+    scrollTl.set({}, {}, 1.1);
+
+    // ══════════════════════════════════════════════
+    // Scene 8: Image collage appears on the gold circle
+    // 1.10–1.14: collage container fades/scales in
+    // 1.14–1.28: individual images stagger in
+    // 1.28–1.40: hold (collage visible, clickable)
+    // ══════════════════════════════════════════════
+
+    // 8a. Collage container scales up
+    scrollTl.to(collage, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.04,
+      ease: "power2.out",
+    }, 1.10);
+
+    // 8b. Stagger individual images in
+    const collageItems = collage.querySelectorAll("[data-collage-item]");
+    scrollTl.to(collageItems, {
+      opacity: 1,
+      duration: 0.02,
+      stagger: 0.004,
+      ease: "power2.out",
+    }, 1.12);
+
+    // 8c. Enable pointer events after images are in
+    scrollTl.set(collage, { pointerEvents: "auto" }, 1.28);
+
+    // Hold with collage visible
+    scrollTl.set({}, {}, 1.40);
 
     const st = ScrollTrigger.create({
-      trigger: section, start: "top top", end: "+=400%",
+      trigger: section, start: "top top", end: "+=1300%",
       pin: true, pinSpacing: true, anticipatePin: 1,
       scrub: 1, animation: scrollTl,
     });
@@ -210,6 +438,39 @@ export default function IntroScene() {
           <img ref={taglineRef} src="/tagline.svg" alt="Powered by Possibilities" className="wordmark__tagline" draggable={false} />
         </div>
       </div>
+
+      {/* i-dot overlay for Scene 4 — outside shiftGroup */}
+      <div ref={iDotRef} className="intro__i-dot" aria-hidden="true">
+        <svg viewBox="0 0 32.24 31.89" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,15.77c0,9.02,7.18,16.12,15.86,16.12,9.29,0,16.38-7.1,16.38-16.12S25.14,0,15.86,0C7.18,0,0,6.83,0,15.77h0Z" fill="#c3884f"/>
+        </svg>
+      </div>
+
+      {/* Scene 4 text — positioned around the gold circle */}
+      <div className="intro__scene4-text" aria-hidden="true">
+        <div ref={callIt1Ref} className="scene4__call-it scene4__call-it--top">Call it</div>
+        <div ref={capRef} className="scene4__big-text scene4__capabilities">capabilities</div>
+        <div ref={callIt2Ref} className="scene4__call-it scene4__call-it--bottom">Call it</div>
+        <div ref={possRef} className="scene4__big-text scene4__possibilities">possibilities</div>
+      </div>
+
+      {/* Video circle — zooms from center to cover the gold dot */}
+      <div ref={videoWrapRef} className="intro__video-circle">
+        <video
+          ref={videoRef}
+          src="/videos/intro-reel.mp4"
+          muted
+          loop
+          playsInline
+          preload="auto"
+        />
+      </div>
+
+      {/* Scene 8: Image collage — overlays the gold circle */}
+      <div ref={collageRef} className="intro__collage">
+        <ImageCollage />
+      </div>
+
       <NavOrbit />
       <div className="sr-only">Exicon Group — Powered by Possibilities.</div>
     </section>

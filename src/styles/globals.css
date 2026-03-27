@@ -15,7 +15,15 @@
 }
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; -webkit-text-size-adjust:100%; }
+
+/* Cross-platform font rendering — consistent on Mac + Windows */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: geometricPrecision;
+}
+
 body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hidden; line-height:1.6; }
 
 /* Loading state */
@@ -144,12 +152,143 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
 }
 
 /* ============================================
+   I-DOT OVERLAY (Scene 4 — zoom transition)
+   ============================================ */
+.intro__i-dot {
+  position: absolute;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform-origin: center center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.intro__i-dot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================
+   SCENE 4 TEXT (around the gold circle)
+   ============================================ */
+.intro__scene4-text {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.scene4__call-it {
+  position: absolute;
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(28px, 5vw, 90px);
+  color: #c3884f;
+  line-height: 1.2;
+  opacity: 0;
+  letter-spacing: 0.01em;
+}
+
+.scene4__call-it--top {
+  left: 26vw;
+  top: 25vh;
+}
+
+.scene4__call-it--bottom {
+  left: 63vw;
+  top: 55vh;
+}
+
+.scene4__big-text {
+  position: absolute;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: clamp(44px, 8.5vw, 160px);
+  color: #fff;
+  line-height: 1.05;
+  opacity: 0;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.scene4__capabilities {
+  left: 26vw;
+  top: 30vh;
+}
+
+.scene4__possibilities {
+  left: 33vw;
+  top: 63vh;
+}
+
+/* ============================================
+   VIDEO CIRCLE (Scene 6 — covers gold dot)
+   Centered, circular clip, scales from 0 to match the dot.
+   ============================================ */
+.intro__video-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  -webkit-transform: translate(-50%, -50%) scale(0);
+  z-index: 5;
+  width: 72vmax;
+  height: 72vmax;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.intro__video-circle video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ============================================
+   IMAGE COLLAGE (Scene 8 — overlays the gold circle)
+   ============================================ */
+.intro__collage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  -webkit-transform: translate(-50%, -50%) scale(0.5);
+  z-index: 6;
+  width: 69.5vmax;
+  height: 69.5vmax;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ============================================
    RESPONSIVE — 1024px and below
    ============================================ */
 @media (max-width: 1024px) {
   .intro__logo-wrap {
     width: clamp(240px, 55vw, 480px);
   }
+
+  .scene4__call-it { font-size: clamp(24px, 4.5vw, 55px); }
+  .scene4__big-text { font-size: clamp(40px, 7.5vw, 110px); }
+
+  .scene4__call-it--top       { left: 24vw; top: 26vh; }
+  .scene4__capabilities       { left: 24vw; top: 32vh; }
+  .scene4__call-it--bottom    { left: 58vw; top: 54vh; }
+  .scene4__possibilities      { left: 28vw; top: 62vh; }
 }
 
 /* ============================================
@@ -166,13 +305,30 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   .wordmark__logo-target { height: clamp(26px, 7.5vw, 42px); }
   .wordmark__right { height: clamp(24px, 7vw, 40px); }
   .wordmark__tagline { height: clamp(8px, 2.5vw, 18px); }
+
+  .scene4__call-it { font-size: clamp(20px, 4vw, 40px); }
+  .scene4__big-text { font-size: clamp(34px, 7vw, 80px); }
+
+  .scene4__call-it--top       { left: 14vw; top: 28vh; }
+  .scene4__capabilities       { left: 14vw; top: 33vh; }
+  .scene4__call-it--bottom    { left: 48vw; top: 54vh; }
+  .scene4__possibilities      { left: 18vw; top: 61vh; }
+
+  .intro__video-circle {
+    width: 65vmax;
+    height: 65vmax;
+  }
+
+  .intro__collage {
+    width: 65vmax;
+    height: 65vmax;
+  }
 }
 
 /* ============================================
    RESPONSIVE — 480px and below (large phone)
    ============================================ */
 @media (max-width: 480px) {
-  /* Allow mobile orbit to extend beyond section bottom */
   .intro {
     overflow: visible;
   }
@@ -186,6 +342,24 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   .wordmark__right { height: clamp(18px, 6vw, 30px); }
   .wordmark__tagline { height: clamp(6px, 2vw, 14px); }
   .wordmark { gap: 8px; }
+
+  .scene4__call-it { font-size: 16px; }
+  .scene4__big-text { font-size: 32px; }
+
+  .scene4__call-it--top       { left: 19vw; top: 40vh; }
+  .scene4__capabilities       { left: 18vw; top: 41vh; }
+  .scene4__call-it--bottom    { left: 75vw; top: 55vh; }
+  .scene4__possibilities      { left: 46vw; top: 56.5vh; }
+
+  .intro__video-circle {
+    width: 58vmax;
+    height: 58vmax;
+  }
+
+  .intro__collage {
+    width: 58vmax;
+    height: 58vmax;
+  }
 }
 
 /* ---- ACCESSIBILITY ---- */
