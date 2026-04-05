@@ -16,8 +16,8 @@ export interface CollageItem {
   };
 }
 
-/* ── Data (36 items, cycling c1–c9.jpg) ── */
-export const COLLAGE_ITEMS: CollageItem[] = Array.from({ length: 28 }, (_, i) => ({
+/* ── Data (12 items total) ── */
+export const COLLAGE_ITEMS: CollageItem[] = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   src: `/images/c${(i % 9) + 1}.jpg`,
   alt: [
@@ -25,48 +25,22 @@ export const COLLAGE_ITEMS: CollageItem[] = Array.from({ length: 28 }, (_, i) =>
     "Patient education", "Event photography", "Green background",
     "Conference stage", "Main feature", "Brain visual",
     "Welcome screen", "Red cross", "73% stat",
-    "LentiFlor", "Business meeting", "Sacumada",
-    "Obesity campaign", "Small landscape", "Guitar player",
-    "Neon portrait", "Product shot", "Viderance",
-    "Small card", "Rifagut", "Square small",
-    "Car campaign", "Landscape wide", "Anatomy diagram",
-    "Medical doc", "Small square", "Untie campaign",
-    "Small square", "Summit group", "Bottom landscape",
-    "Bottom small", "Bottom wide", "Bottom landscape",
   ][i] || `Image ${i + 1}`,
   popup: {
     client: [
       "Dr. Reddy's", "Sun Pharma", "Cipla Ltd", "Abbott India",
       "Lupin", "Glenmark", "Biocon", "Zydus Lifesciences",
       "Torrent Pharma", "Alkem Labs", "Mankind Pharma", "Ipca Labs",
-      "Ajanta Pharma", "Natco Pharma", "Laurus Labs", "Divi's Labs",
-      "Aurobindo Pharma", "Cadila Healthcare", "Wockhardt", "Strides Pharma",
-      "Eris Lifesciences", "JB Chemicals", "Suven Pharma", "Granules India",
-      "Aarti Drugs", "Solara Active", "Shilpa Medicare", "Neuland Labs",
-      "Syngene Intl", "Piramal Pharma", "Gland Pharma", "Alembic Pharma",
-      "Dr. Reddy's", "Sun Pharma", "Cipla Ltd", "Abbott India",
     ][i],
     brand: [
       "Nise SP", "Volini Gel", "Cipladine", "Duphalac",
       "Sumo Cold", "Candid-B", "BioMAb", "Lipaglyn",
       "Chymoral Forte", "Clavam 625", "Manforce Plus", "Zerodol SP",
-      "Azifast", "Velpatasvir", "Laurus Tabs", "Custom API",
-      "Aurogra", "Reditux", "Proxyvon", "Strides OTC",
-      "Glimisave", "Rantac", "Suvenca", "Granisetron",
-      "Aarti Capsule", "Ranitidine", "Shilpa Oncology", "Levetiracetam",
-      "Syngene Bio", "Piramal ICU", "Enoxaparin", "Azithral",
-      "Omez DSR", "Pantodac", "Ciplox TZ", "Cremaffin",
     ][i],
     concept: [
       "Meet Super Serratio", "Pain-free Living", "Antiseptic Guard", "Gut Health First",
       "Cold Combat", "Skin Shield", "Targeted Therapy", "Lipid Control",
       "Inflammation Fighter", "Antibiotic Power", "Wellness Plus", "Joint Relief",
-      "Fast Action", "Hepatitis Cure", "Tablet Innovation", "API Excellence",
-      "Performance Boost", "Biosimilar Story", "Pain Management", "OTC Revolution",
-      "Diabetes Care", "Acidity Relief", "Neural Support", "Nausea Control",
-      "Capsule Design", "Stomach Care", "Oncology Hope", "Seizure Control",
-      "Bio Research", "Critical Care", "Blood Thinner", "Infection Fighter",
-      "Digestive Health", "Acid Control", "Dual Action", "Smooth Flow",
     ][i],
     description: [
       "The objective was to take share from conventional pain/inflammation relief formulations. Drawing from gaming culture, we created the unstoppable force of SuperSerratio.",
@@ -81,87 +55,99 @@ export const COLLAGE_ITEMS: CollageItem[] = Array.from({ length: 28 }, (_, i) =>
       "Antibiotic stewardship campaign promoting responsible use, featuring interactive decision-support tools for physicians.",
       "Wellness supplement launch combining fitness influencer partnerships with pharmacy activation programs.",
       "Joint care campaign using patient journey storytelling and orthopedic surgeon partnerships to drive prescription conversion.",
-      "Rapid-action antibiotic campaign with speed-of-relief messaging, supported by pharmacokinetic data visualization.",
-      "Hepatitis C cure campaign bringing hope through patient success stories, supported by government health programs.",
-      "Innovative tablet-in-tablet technology story brought to life through 3D animations showing formulation protection.",
-      "API manufacturing excellence showcase highlighting quality standards and global export capabilities.",
-      "Performance enhancement campaign targeting men's health with sensitivity and medical credibility.",
-      "Biosimilar launch campaign educating oncologists on bioequivalence data with KOL advocacy.",
-      "Comprehensive pain management portfolio campaign with unified brand architecture across multiple products.",
-      "OTC brand revolution campaign making prescription-quality products accessible over the counter.",
-      "Diabetes management campaign combining glucose monitoring education with medication adherence programs.",
-      "Acidity relief campaign using humor and relatable scenarios, achieving viral social media engagement.",
-      "Neurological support campaign for epilepsy awareness, breaking stigma through patient advocacy stories.",
-      "Post-chemotherapy nausea management campaign supporting patients with practical guidance and comfort tips.",
-      "Capsule redesign project improving patient compliance through easier-to-swallow formulation.",
-      "Stomach care campaign promoting proactive digestive health through seasonal awareness drives.",
-      "Oncology hope campaign featuring survivor stories designed to support patients through their treatment journey.",
-      "Seizure control campaign combining patient monitoring tools with caregiver education programs.",
-      "Bio research capabilities showcase for international partners, highlighting state-of-the-art facilities.",
-      "Critical care product campaign for ICU medications, targeting hospital formulary committees.",
-      "Blood thinner campaign for surgical and cardiac care settings, featuring dosing calculators.",
-      "Infection fighter campaign for respiratory antibiotics, using seasonal flu surge data for timely awareness.",
-      "Digestive health portfolio campaign bringing together multiple brands under a unified therapeutic approach.",
-      "Acid control innovation campaign highlighting modified-release technology with clinical comparison data.",
-      "Dual-action antibiotic campaign targeting complex infections, using real-world case studies.",
-      "Smooth digestive flow campaign using gentle creative direction to destigmatize constipation conversations.",
     ][i],
   },
 }));
 
-/* ── Layout positions (% of circle container) ── */
-const LAYOUTS = [
-  // ── Row 1 (upper) — 6 items ──
-  { left: 8,  top: 23, width: 8,  height: 11, rotate: 1 },
-  { left: 17, top: 24, width: 11, height: 9,  rotate: -0.6 },
-  { left: 29, top: 23, width: 13, height: 9,  rotate: 0.3 },
-  { left: 43, top: 22, width: 17, height: 13, rotate: -0.3 },
-  { left: 61, top: 23, width: 14, height: 10, rotate: 0.5 },
-  { left: 76, top: 23, width: 13, height: 11, rotate: -0.8 },
-  // ── Row 2 (center-top) — 9 items ──
-  { left: 2,  top: 36, width: 7,  height: 15, rotate: 0.6 },
-  { left: 10, top: 36, width: 8,  height: 8,  rotate: -0.3 },
-  { left: 10, top: 45, width: 9,  height: 7,  rotate: 0.4 },
-  { left: 20, top: 35, width: 13, height: 13, rotate: -0.2 },
-  { left: 34, top: 35, width: 19, height: 15, rotate: 0.15 },
-  { left: 54, top: 36, width: 15, height: 9,  rotate: -0.5 },
-  { left: 70, top: 36, width: 10, height: 7,  rotate: 0.4 },
-  { left: 81, top: 35, width: 9,  height: 11, rotate: -1.2 },
-  { left: 91, top: 36, width: 8,  height: 14, rotate: 0.8 },
-  // ── Row 3 (center-bottom) — 7 items ──
-  { left: 7,  top: 54, width: 8,  height: 8,  rotate: -0.4 },
-  { left: 16, top: 53, width: 13, height: 7,  rotate: 0.3 },
-  { left: 30, top: 54, width: 10, height: 7,  rotate: -0.3 },
-  { left: 41, top: 53, width: 13, height: 7,  rotate: 0.5 },
-  { left: 55, top: 54, width: 7,  height: 7,  rotate: -0.6 },
-  { left: 63, top: 53, width: 15, height: 8,  rotate: 0.3 },
-  { left: 79, top: 54, width: 12, height: 7,  rotate: -0.7 },
-  // ── Row 4 (lower) — 6 items ──
-  { left: 12, top: 64, width: 11, height: 11, rotate: 0.5 },
-  { left: 24, top: 64, width: 11, height: 8,  rotate: -0.4 },
-  { left: 36, top: 63, width: 7,  height: 8,  rotate: 0.3 },
-  { left: 44, top: 62, width: 15, height: 12, rotate: -0.2 },
-  { left: 60, top: 64, width: 8,  height: 7,  rotate: 0.4 },
-  { left: 69, top: 63, width: 14, height: 10, rotate: -0.6 },
-];
+/* ── Responsive grid config ── */
+interface GridConfig {
+  cols: number;
+  rows: number;
+  total: number;
+  swapCount: number;
+}
 
-/* ── Popup ── */
+function getGridConfig(): GridConfig {
+  if (typeof window === "undefined") return { cols: 4, rows: 3, total: 12, swapCount: 4 };
+  const w = window.innerWidth;
+  // ≤480px: 3×3 (9 items, 2 swaps)  |  >480px: 4×3 (12 items, 4 swaps)
+  if (w <= 480) return { cols: 3, rows: 3, total: 9, swapCount: 2 };
+  return { cols: 4, rows: 3, total: 12, swapCount: 4 };
+}
+
+const GAP = 0.5; // % gap between tiles
+
+/* ── Wobble keyframes (injected once into <head>) ── */
+const WOBBLE_KEYFRAMES = `
+@keyframes collage-wb0{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(3px,-2px) rotate(0.4deg)}66%{transform:translate(-2px,3px) rotate(-0.3deg)}}
+@keyframes collage-wb1{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(-3px,2px) rotate(-0.5deg)}66%{transform:translate(2px,-3px) rotate(0.3deg)}}
+@keyframes collage-wb2{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(2px,3px) rotate(0.3deg)}66%{transform:translate(-3px,-2px) rotate(-0.4deg)}}
+@keyframes collage-wb3{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(-2px,-3px) rotate(-0.3deg)}66%{transform:translate(3px,2px) rotate(0.5deg)}}
+@keyframes collage-wb4{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(3px,2px) rotate(-0.4deg)}66%{transform:translate(-2px,-3px) rotate(0.3deg)}}
+@keyframes collage-wb5{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(-3px,-2px) rotate(0.5deg)}66%{transform:translate(2px,3px) rotate(-0.3deg)}}
+`;
+
+const WOBBLE_DURATIONS = [3.8, 4.2, 3.5, 4.6, 3.3, 4.0];
+
+/* ── Helpers ── */
+function getNeighbors(slot: number, cols: number, rows: number): number[] {
+  const col = slot % cols;
+  const row = Math.floor(slot / cols);
+  const n: number[] = [];
+  if (col > 0) n.push(slot - 1);
+  if (col < cols - 1) n.push(slot + 1);
+  if (row > 0) n.push(slot - cols);
+  if (row < rows - 1) n.push(slot + cols);
+  return n;
+}
+
+function slotPos(slot: number, cols: number) {
+  const cellW = 100 / cols;
+  const cellH = 100 / 3; // rows always 3
+  return {
+    left: (slot % cols) * cellW,
+    top: Math.floor(slot / cols) * cellH,
+  };
+}
+
+/* ══════════════════════════════════════════════
+   Popup — circular gold card
+   Side-by-side ≥480px, stacked <480px
+   ══════════════════════════════════════════════ */
 function CollagePopup({ item, onClose }: { item: CollageItem | null; onClose: () => void }) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile for stacked layout
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const check = () => setIsMobile(window.innerWidth <= 480);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     if (!item || !backdropRef.current || !cardRef.current || !contentRef.current) return;
     gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" });
-    gsap.fromTo(cardRef.current, { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.4)", delay: 0.05 });
-    gsap.fromTo(contentRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out", delay: 0.2 });
+    gsap.fromTo(cardRef.current,
+      { scale: 0.3, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.4)", delay: 0.05 }
+    );
+    gsap.fromTo(contentRef.current,
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.4, ease: "power2.out", delay: 0.2 }
+    );
   }, [item]);
 
   const handleClose = useCallback(() => {
     if (!backdropRef.current || !cardRef.current) { onClose(); return; }
     gsap.to(cardRef.current, { scale: 0.3, opacity: 0, duration: 0.25, ease: "power2.in" });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.3, ease: "power2.in", delay: 0.05, onComplete: onClose });
+    gsap.to(backdropRef.current, {
+      opacity: 0, duration: 0.3, ease: "power2.in", delay: 0.05, onComplete: onClose,
+    });
   }, [onClose]);
 
   useEffect(() => {
@@ -180,8 +166,10 @@ function CollagePopup({ item, onClose }: { item: CollageItem | null; onClose: ()
       style={{
         position: "fixed", inset: 0, zIndex: 200,
         display: "flex", alignItems: "center", justifyContent: "center",
-        background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)", cursor: "pointer",
+        background: "rgba(0,0,0,0.7)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        cursor: "pointer",
         padding: "16px",
       }}
     >
@@ -190,22 +178,31 @@ function CollagePopup({ item, onClose }: { item: CollageItem | null; onClose: ()
         onClick={(e) => e.stopPropagation()}
         style={{
           position: "relative",
-          width: "min(90vw, min(90vh, 700px))",
-          height: "min(90vw, min(90vh, 700px))",
-          borderRadius: "50%", background: "#c3884f", overflow: "hidden",
-          cursor: "default", display: "flex", alignItems: "center", justifyContent: "center",
+          /* Flattened min() — clamp is universally supported */
+          width: "clamp(260px, 85vmin, 700px)",
+          height: "clamp(260px, 85vmin, 700px)",
+          borderRadius: "50%",
+          background: "#c3884f",
+          overflow: "hidden",
+          cursor: "default",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           boxShadow: "0 20px 80px rgba(0,0,0,0.5)",
-          /* GPU layer for smooth animation on all platforms */
+          /* GPU compositing — consistent Mac + Windows + iOS + Android */
+          transform: "translateZ(0)",
           WebkitTransform: "translateZ(0)",
           willChange: "transform, opacity",
-        }}
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
+        } as React.CSSProperties}
       >
-        {/* Close */}
+        {/* Close button */}
         <button
           onClick={handleClose}
           aria-label="Close popup"
           style={{
-            position: "absolute", top: "15%", right: "15%", zIndex: 10,
+            position: "absolute", top: "12%", right: "12%", zIndex: 10,
             width: "clamp(28px, 5vw, 36px)", height: "clamp(28px, 5vw, 36px)",
             borderRadius: "50%", border: "none",
             background: "rgba(0,0,0,0.5)", color: "#fff", cursor: "pointer",
@@ -213,58 +210,91 @@ function CollagePopup({ item, onClose }: { item: CollageItem | null; onClose: ()
             transition: "background 0.2s, transform 0.2s",
             WebkitTapHighlightColor: "transparent",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.8)"; e.currentTarget.style.transform = "scale(1.1)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.5)"; e.currentTarget.style.transform = "scale(1)"; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(0,0,0,0.8)";
+            e.currentTarget.style.transform = "scale(1.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(0,0,0,0.5)";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
         </button>
 
-        {/* Content — responsive: side-by-side on desktop, stacked on mobile */}
-        <div ref={contentRef} className="collage-popup-content" style={{
-          width: "70%", height: "56%",
-          display: "flex", gap: "5%", alignItems: "center",
-          /* On very small circles (<400px), stack vertically */
-        }}>
+        {/* Content — responsive: side-by-side ≥480, stacked <480 */}
+        <div
+          ref={contentRef}
+          style={{
+            width: isMobile ? "75%" : "72%",
+            height: isMobile ? "65%" : "58%",
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: "center",
+            gap: isMobile ? "8%" : "5%",
+          }}
+        >
           {/* Image */}
-          <div className="collage-popup-image" style={{
-            flex: "0 0 48%", height: "100%",
-            borderRadius: "clamp(3px, 0.8vw, 6px)", overflow: "hidden", background: "#2a1f14",
-          }}>
+          <div
+            style={{
+              flex: isMobile ? "0 0 45%" : "0 0 46%",
+              width: isMobile ? "100%" : "auto",
+              height: isMobile ? "auto" : "100%",
+              aspectRatio: isMobile ? "16 / 10" : "auto",
+              borderRadius: "clamp(3px, 0.8vw, 6px)",
+              overflow: "hidden",
+              background: "#2a1f14",
+            }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={item.src} alt={item.alt}
+              src={item.src}
+              alt={item.alt}
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               draggable={false}
             />
           </div>
+
           {/* Text */}
-          <div className="collage-popup-text" style={{
-            flex: 1, display: "flex", flexDirection: "column",
-            gap: "clamp(4px, 1vw, 10px)", overflow: "hidden",
-            fontFamily: "'Bahnschrift', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
-          }}>
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: "clamp(3px, 1vw, 10px)",
+              overflow: "hidden",
+              fontFamily: "var(--font-body, 'Bahnschrift'), 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
+              /* Cross-platform text rendering */
+              WebkitFontSmoothing: "antialiased",
+              MozOsxFontSmoothing: "grayscale",
+              textRendering: "geometricPrecision",
+            } as React.CSSProperties}
+          >
             <div>
-              <p style={{ margin: 0, fontSize: "clamp(10px, 1.6vw, 13px)", color: "rgba(0,0,0,0.5)", fontWeight: 400 }}>
+              <p style={{ margin: 0, fontSize: "clamp(9px, 1.6vw, 13px)", color: "rgba(0,0,0,0.5)", fontWeight: 400 }}>
                 <strong style={{ color: "#000", fontWeight: 600 }}>Client:</strong> {item.popup.client}
               </p>
-              <p style={{ margin: "2px 0 0", fontSize: "clamp(10px, 1.6vw, 13px)", color: "rgba(0,0,0,0.5)", fontWeight: 400 }}>
+              <p style={{ margin: "2px 0 0", fontSize: "clamp(9px, 1.6vw, 13px)", color: "rgba(0,0,0,0.5)", fontWeight: 400 }}>
                 <strong style={{ color: "#000", fontWeight: 600 }}>Brand:</strong> {item.popup.brand}
               </p>
-              <p style={{ margin: "2px 0 0", fontSize: "clamp(10px, 1.6vw, 13px)", color: "rgba(0,0,0,0.5)", fontWeight: 400 }}>
+              <p style={{ margin: "2px 0 0", fontSize: "clamp(9px, 1.6vw, 13px)", color: "rgba(0,0,0,0.5)", fontWeight: 400 }}>
                 <strong style={{ color: "#000", fontWeight: 600 }}>Concept:</strong> {item.popup.concept}
               </p>
             </div>
-            <div style={{ width: "clamp(24px, 4vw, 40px)", height: 1.5, background: "rgba(0,0,0,0.15)" }} />
-            <p style={{
-              margin: 0, fontSize: "clamp(9px, 1.4vw, 12px)", lineHeight: 1.55,
-              color: "rgba(0,0,0,0.55)", fontWeight: 400,
-              maxHeight: "clamp(60px, 15vw, 120px)", overflow: "hidden",
-              /* Consistent text rendering Mac/Windows */
-              WebkitFontSmoothing: "antialiased",
-              MozOsxFontSmoothing: "grayscale",
-            } as React.CSSProperties}>
+            <div style={{ width: "clamp(20px, 4vw, 40px)", height: 1.5, background: "rgba(0,0,0,0.15)" }} />
+            <p
+              style={{
+                margin: 0,
+                fontSize: "clamp(8px, 1.3vw, 12px)",
+                lineHeight: 1.55,
+                color: "rgba(0,0,0,0.55)",
+                fontWeight: 400,
+                maxHeight: isMobile ? "clamp(40px, 12vw, 80px)" : "clamp(60px, 15vw, 120px)",
+                overflow: "hidden",
+              }}
+            >
               {item.popup.description}
             </p>
           </div>
@@ -274,7 +304,9 @@ function CollagePopup({ item, onClose }: { item: CollageItem | null; onClose: ()
   );
 }
 
-/* ── Main collage component ── */
+/* ══════════════════════════════════════════════
+   Main collage — responsive grid + wobble + adjacent swaps
+   ══════════════════════════════════════════════ */
 interface ImageCollageProps {
   className?: string;
 }
@@ -282,80 +314,212 @@ interface ImageCollageProps {
 export default function ImageCollage({ className }: ImageCollageProps) {
   const [popupItem, setPopupItem] = useState<CollageItem | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const tileAtSlotRef = useRef<number[]>([]);
+  const busyRef = useRef<Set<number>>(new Set());
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const gridRef = useRef<GridConfig>(
+    typeof window !== "undefined" ? getGridConfig() : { cols: 4, rows: 3, total: 12, swapCount: 4 }
+  );
 
-  // Gentle float animation — each image drifts slightly, staggered
+  // Track grid config — rebuild on resize across breakpoints
+  const [grid, setGrid] = useState<GridConfig>(() =>
+    typeof window !== "undefined" ? getGridConfig() : { cols: 4, rows: 3, total: 12, swapCount: 4 }
+  );
+
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const items = container.querySelectorAll("[data-collage-item]");
-    const tweens: gsap.core.Tween[] = [];
-
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-
-    items.forEach((el, i) => {
-      const dir = i % 2 === 0 ? 1 : -1;
-      const yDrift = 2 + Math.random() * 3;    // 2–5px
-      const xDrift = 1 + Math.random() * 2;    // 1–3px
-      const dur = 2.5 + Math.random() * 2;     // 2.5–4.5s
-      const delay = Math.random() * 2;          // random start offset
-
-      tweens.push(
-        gsap.to(el, {
-          y: `+=${dir * yDrift}`,
-          x: `+=${dir * xDrift}`,
-          duration: dur,
-          ease: "sine.inOut",
-          repeat: -1,
-          yoyo: true,
-          delay,
-        })
-      );
-    });
-
-    return () => { tweens.forEach((t) => t.kill()); };
+    const update = () => {
+      const next = getGridConfig();
+      setGrid((prev) => {
+        if (prev.cols === next.cols) return prev;
+        return next;
+      });
+      gridRef.current = next;
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
+  // Inject wobble keyframes once (safe for HMR / StrictMode)
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.getElementById("collage-wobble-styles")) return;
+    const style = document.createElement("style");
+    style.id = "collage-wobble-styles";
+    style.textContent = WOBBLE_KEYFRAMES;
+    document.head.appendChild(style);
+    return () => { style.remove(); };
+  }, []);
+
+  // Initialize / reinitialize slot mapping when grid config changes
+  useEffect(() => {
+    tileAtSlotRef.current = Array.from({ length: grid.total }, (_, i) => i);
+    busyRef.current.clear();
+    // Reset tile positions to their grid slots
+    const cellW = 100 / grid.cols;
+    const cellH = 100 / grid.rows;
+    tileRefs.current.forEach((el, i) => {
+      if (!el || i >= grid.total) return;
+      const col = i % grid.cols;
+      const row = Math.floor(i / grid.cols);
+      el.style.left = `${col * cellW}%`;
+      el.style.top = `${row * cellH}%`;
+      el.style.width = `${cellW - GAP}%`;
+      el.style.height = `${cellH - GAP}%`;
+    });
+  }, [grid]);
+
+  // Adjacent swap interval — scales swap count by screen size
+  useEffect(() => {
+    const reduced = typeof window !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+
+    const doSwap = (sA: number, sB: number) => {
+      const tileArr = tileRefs.current;
+      const slotMap = tileAtSlotRef.current;
+      const busy = busyRef.current;
+      const g = gridRef.current;
+
+      const tA = slotMap[sA];
+      const tB = slotMap[sB];
+      if (tA == null || tB == null) return;
+      const elA = tileArr[tA];
+      const elB = tileArr[tB];
+      if (!elA || !elB) return;
+
+      const pA = slotPos(sA, g.cols);
+      const pB = slotPos(sB, g.cols);
+
+      busy.add(sA);
+      busy.add(sB);
+
+      elA.style.zIndex = "3";
+      elB.style.zIndex = "3";
+      elA.style.left = `${pB.left}%`;
+      elA.style.top = `${pB.top}%`;
+      elB.style.left = `${pA.left}%`;
+      elB.style.top = `${pA.top}%`;
+
+      slotMap[sA] = tB;
+      slotMap[sB] = tA;
+
+      setTimeout(() => {
+        elA.style.zIndex = "1";
+        elB.style.zIndex = "1";
+        busy.delete(sA);
+        busy.delete(sB);
+      }, 1100);
+    };
+
+    const runSwaps = () => {
+      if (popupItem) return;
+
+      const busy = busyRef.current;
+      const g = gridRef.current;
+      let swapped = 0;
+      let attempts = 0;
+
+      while (swapped < g.swapCount && attempts < 40) {
+        attempts++;
+        const sA = Math.floor(Math.random() * g.total);
+        if (busy.has(sA)) continue;
+        const nbrs = getNeighbors(sA, g.cols, g.rows).filter((s) => !busy.has(s));
+        if (nbrs.length === 0) continue;
+        const sB = nbrs[Math.floor(Math.random() * nbrs.length)];
+        doSwap(sA, sB);
+        swapped++;
+      }
+    };
+
+    intervalRef.current = setInterval(runSwaps, 2000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [popupItem, grid]);
+
+  const visibleItems = COLLAGE_ITEMS.slice(0, grid.total);
+  const cellW = 100 / grid.cols;
+  const cellH = 100 / grid.rows;
+
   return (
-    <div ref={containerRef} className={className} style={{
-      position: "relative", width: "100%", height: "100%",
-      borderRadius: "50%", overflow: "hidden",
-      /* GPU compositing for smooth scroll animation */
-      WebkitTransform: "translateZ(0)",
-      willChange: "transform, opacity",
-    }}>
-      {COLLAGE_ITEMS.map((item, i) => {
-        const layout = LAYOUTS[i];
-        if (!layout) return null;
+    <div
+      ref={containerRef}
+      className={className}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        overflow: "hidden",
+        background: "#111",
+        /* GPU compositing — all platforms */
+        transform: "translateZ(0)",
+        WebkitTransform: "translateZ(0)",
+        willChange: "transform, opacity",
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+      } as React.CSSProperties}
+    >
+      {visibleItems.map((item, i) => {
+        const col = i % grid.cols;
+        const row = Math.floor(i / grid.cols);
+        const wobbleIdx = i % WOBBLE_DURATIONS.length;
 
         return (
           <div
             key={item.id}
+            ref={(el) => { tileRefs.current[i] = el; }}
             data-collage-item
             onClick={() => setPopupItem(item)}
             style={{
               position: "absolute",
-              left: `${layout.left}%`,
-              top: `${layout.top}%`,
-              width: `${layout.width}%`,
-              height: `${layout.height}%`,
-              borderRadius: 2,
-              overflow: "hidden",
+              left: `${col * cellW}%`,
+              top: `${row * cellH}%`,
+              width: `${cellW - GAP}%`,
+              height: `${cellH - GAP}%`,
               cursor: "pointer",
-              transform: `rotate(${layout.rotate}deg)`,
-              boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
-              opacity: 0,
+              zIndex: 1,
+              transition: "left 1s cubic-bezier(0.25,0.46,0.45,0.94), top 1s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.3s",
+              opacity: 0, /* GSAP stagger-in from IntroScene */
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={item.src}
-              alt={item.alt}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", pointerEvents: "none" }}
-              draggable={false}
-              loading="lazy"
-            />
+            {/* Inner: wobble via CSS keyframes — separate layer from swap transitions */}
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 3,
+                overflow: "hidden",
+                animation: `collage-wb${wobbleIdx} ${WOBBLE_DURATIONS[wobbleIdx]}s ease-in-out infinite`,
+                animationDelay: `${-i * 0.6}s`,
+                /* GPU layer for wobble — prevents jank on Windows Chrome */
+                willChange: "transform",
+                transform: "translateZ(0)",
+                WebkitTransform: "translateZ(0)",
+                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
+              } as React.CSSProperties}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.src}
+                alt={item.alt}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                  pointerEvents: "none",
+                  /* Prevent drag ghost on all platforms */
+                  WebkitUserDrag: "none",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                } as React.CSSProperties}
+                draggable={false}
+                loading="lazy"
+              />
+            </div>
           </div>
         );
       })}
