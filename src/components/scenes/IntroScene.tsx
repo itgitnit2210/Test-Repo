@@ -430,40 +430,79 @@ export default function IntroScene() {
     const s7BodyStart = s7TextStart + 0.14;
     scrollTl.set({}, {}, s7BodyStart);
 
-    // 7d. Fade in body content after headlines are complete
-    if (s7ScrollClip) {
-      scrollTl.to(s7ScrollClip, { opacity: 1, duration: 0.04, ease: "power2.out" }, s7BodyStart);
-    }
-
-    // 7e. Scroll only the body content (not the headline) upward.
-    //     The headline stays fixed; the scroll-clip area clips overflow.
+    // 7d. Section-by-section reveal
+    //     Each section/value fades in individually while the container
+    //     scrolls up in steps to keep the active item in view.
     const s7Inner = s7Text.querySelector("[data-s7-inner]") as HTMLElement;
     const s7Clip  = s7Text.querySelector(".s7__scroll-clip") as HTMLElement;
-    if (s7Inner && s7Clip) {
+
+    let s7EndTime = s7BodyStart + 0.10; // fallback
+
+    if (s7ScrollClip && s7Inner && s7Clip) {
+      // Show the scroll-clip container
+      scrollTl.to(s7ScrollClip, { opacity: 1, duration: 0.04, ease: "power2.out" }, s7BodyStart);
       gsap.set(s7Inner, { y: 0 });
-      scrollTl.to(s7Inner, {
-        y: () => -(s7Inner.scrollHeight - s7Clip.offsetHeight),
-        duration: 0.50,
-        ease: "none",
-      }, s7BodyStart + 0.02);
+
+      // Collect all scrollable sections: .s7__section and .s7__value
+      const s7Sections = s7Inner.querySelectorAll(".s7__section, .s7__value");
+      const sectionCount = s7Sections.length;
+
+      // Each section gets a slice of timeline
+      const SECTION_STEP = 0.06;
+      const SECTION_START = s7BodyStart + 0.04;
+
+      // Hide all sections initially
+      s7Sections.forEach((sec) => {
+        gsap.set(sec, { opacity: 0, y: 20 });
+      });
+
+      // Animate each section in sequence
+      s7Sections.forEach((sec, i) => {
+        const t = SECTION_START + i * SECTION_STEP;
+
+        // Fade + slide in this section
+        scrollTl.to(sec, {
+          opacity: 1, y: 0, duration: 0.03, ease: "power2.out",
+        }, t);
+
+        // Scroll the container up so this section stays in view
+        // (only needed after the first few items fill the clip area)
+        if (i > 1) {
+          const scrollAmount = () => {
+            const secEl = sec as HTMLElement;
+            const secBottom = secEl.offsetTop + secEl.offsetHeight;
+            const clipH = s7Clip.offsetHeight;
+            return Math.max(0, secBottom - clipH);
+          };
+          scrollTl.to(s7Inner, {
+            y: () => -scrollAmount(),
+            duration: 0.04,
+            ease: "power1.inOut",
+          }, t);
+        }
+      });
+
+      // Hold after last section
+      const s7SectionsEnd = SECTION_START + sectionCount * SECTION_STEP;
+      scrollTl.set({}, {}, s7SectionsEnd + 0.04);
+
+      // 7f. Fade out text + circle
+      const s7FadeOut = s7SectionsEnd + 0.04;
+      scrollTl.to(s7Text, {
+        opacity: 0, duration: 0.04, ease: "power2.in",
+      }, s7FadeOut);
+      scrollTl.to(goldCircle, {
+        opacity: 0, scale: 0.8, duration: 0.04, ease: "power2.in",
+      }, s7FadeOut);
+
+      scrollTl.set({}, {}, s7FadeOut + 0.06);
+      s7EndTime = s7FadeOut + 0.06;
     }
-
-    // ── Hold: end of text scroll ──
-    const s7FadeOut = s7BodyStart + 0.54;
-    scrollTl.set({}, {}, s7FadeOut + 0.06);
-
-    // 7f. Fade out text + circle
-    scrollTl.to(s7Text, {
-      opacity: 0, duration: 0.04, ease: "power2.in",
-    }, s7FadeOut);
-    scrollTl.to(goldCircle, {
-      opacity: 0, scale: 0.8, duration: 0.04, ease: "power2.in",
-    }, s7FadeOut);
 
     // ══════════════════════════════════════════════
     // Scene 8: Video zooms out slowly, orange circle alone again
     // ══════════════════════════════════════════════
-    const s8Start = s7FadeOut + 0.06;
+    const s8Start = s7EndTime;
 
     scrollTl.to(videoWrap, {
       scale: 0, opacity: 0, duration: 0.08, ease: "sine.inOut",
@@ -642,4 +681,3 @@ export default function IntroScene() {
     </section>
   );
 }
-
