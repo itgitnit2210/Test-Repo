@@ -407,12 +407,12 @@ export default function IntroScene() {
       opacity: 1, scale: 1, duration: 0.06, ease: "back.out(1.2)",
     }, s7Start);
 
-    // Pause video when the gold circle / headline sequence begins
-    scrollTl.call(() => { video.pause(); }, [], s7Start);
-
     // ── Hold: gold circle on video ──
     const s7TextStart = s7Start + 0.06;
     scrollTl.set({}, {}, s7TextStart);
+
+    // Pause video when the headline text begins (SCIENCE appears)
+    scrollTl.call(() => { video.pause(); }, [], s7TextStart);
 
     // 7b. Show text container
     scrollTl.set(s7Text, { opacity: 1 }, s7TextStart);
