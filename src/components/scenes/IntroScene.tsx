@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { useIsomorphicLayoutEffect } from "@/hooks/useIsomorphicLayoutEffect";
 import Particles from "./Particles";
@@ -8,6 +8,17 @@ import LogoOutline from "./LogoOutline";
 import LogoSolid from "./LogoSolid";
 import NavOrbit from "./NavOrbit";
 import ImageCollage from "./ImageCollage";
+
+const CYCLING_WORDS = [
+  "POSSIBILITIES",
+  "BRAND STRATEGY",
+  "DESIGN",
+  "EVENTS",
+  "EXHIBITIONS",
+  "DIGITAL",
+  "EXPERIENTIAL",
+  "PRODUCTION",
+];
 
 
 const ICONS = [
@@ -59,11 +70,74 @@ export default function IntroScene() {
   const capRef        = useRef<HTMLDivElement>(null);
   const callIt2Ref    = useRef<HTMLDivElement>(null);
   const possRef       = useRef<HTMLDivElement>(null);
+  const cycleWordsRef = useRef<HTMLSpanElement[]>([]);
+  const cycleIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const cycleIndexRef = useRef(0);
+  const cycleActiveRef = useRef(false);
   const videoWrapRef  = useRef<HTMLDivElement>(null);
   const videoRef      = useRef<HTMLVideoElement>(null);
+  const goldCircleRef = useRef<HTMLDivElement>(null);
+  const s7TextRef     = useRef<HTMLDivElement>(null);
   const collageRef    = useRef<HTMLDivElement>(null);
 
   const [loading, setLoading] = useState(true);
+
+  // Store start/stop in refs so ScrollTrigger onUpdate always sees latest
+  const startCyclingRef = useRef<() => void>(() => {});
+  const stopCyclingRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    startCyclingRef.current = () => {
+      if (cycleActiveRef.current) return;
+      cycleActiveRef.current = true;
+      cycleIndexRef.current = 0;
+
+      const words = cycleWordsRef.current;
+
+      cycleIntervalRef.current = setInterval(() => {
+        const current = cycleIndexRef.current;
+        const next = (current + 1) % CYCLING_WORDS.length;
+        const currentEl = words[current];
+        const nextEl = words[next];
+
+        if (currentEl && nextEl) {
+          const h = currentEl.offsetHeight || 80;
+          // Current word slides up and out
+          gsap.to(currentEl, {
+            y: -h,
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.inOut",
+          });
+          // Next word slides up from below into view
+          gsap.fromTo(nextEl,
+            { y: h, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, ease: "power2.inOut" }
+          );
+        }
+
+        cycleIndexRef.current = next;
+      }, 1800);
+    };
+
+    stopCyclingRef.current = () => {
+      if (!cycleActiveRef.current) return;
+      cycleActiveRef.current = false;
+      if (cycleIntervalRef.current) {
+        clearInterval(cycleIntervalRef.current);
+        cycleIntervalRef.current = null;
+      }
+      // Reset to "possibilities" (index 0) visible
+      const words = cycleWordsRef.current;
+      words.forEach((w, i) => {
+        if (!w) return;
+        gsap.set(w, { y: 0, opacity: i === 0 ? 1 : 0 });
+      });
+      cycleIndexRef.current = 0;
+    };
+
+    return () => { stopCyclingRef.current(); };
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     window.scrollTo(0, 0);
@@ -87,11 +161,13 @@ export default function IntroScene() {
     const poss       = possRef.current;
     const videoWrap  = videoWrapRef.current;
     const video      = videoRef.current;
+    const goldCircle = goldCircleRef.current;
+    const s7Text     = s7TextRef.current;
     const collage    = collageRef.current;
     if (!section || !outline || !solid || !logoWrap || !iconsDiv ||
         !wordmark || !left || !right || !tagline || !logoTarget ||
         !shiftGroup || !iDot || !callIt1 || !cap || !callIt2 || !poss ||
-        !videoWrap || !video || !collage) return;
+        !videoWrap || !video || !goldCircle || !s7Text || !collage) return;
 
     const particlesWrap = section.querySelector(".intro__particles") as HTMLElement;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -105,6 +181,8 @@ export default function IntroScene() {
     gsap.set(iDot, { opacity: 0 });
     gsap.set([callIt1, cap, callIt2, poss], { opacity: 0 });
     gsap.set(videoWrap, { opacity: 0, scale: 0 });
+    gsap.set(goldCircle, { opacity: 0, scale: 0.5 });
+    gsap.set(s7Text, { opacity: 0 });
     gsap.set(collage, { opacity: 0, scale: 0.5 });
 
     setLoading(false);
@@ -263,6 +341,15 @@ export default function IntroScene() {
     gsap.set(cap,     { x: -60, opacity: 0 });
     gsap.set(callIt2, { y: -20, opacity: 0 });
     gsap.set(poss,    { x: -60, opacity: 0 });
+    // "possibilities" (index 0) visible in place; rest hidden below
+    cycleWordsRef.current.forEach((w, i) => {
+      if (!w) return;
+      if (i === 0) {
+        gsap.set(w, { y: 0, opacity: 1 });
+      } else {
+        gsap.set(w, { y: 0, opacity: 0 });
+      }
+    });
 
     // "Call it" top — fade in
     scrollTl.to(callIt1, {
@@ -279,7 +366,7 @@ export default function IntroScene() {
       y: 0, opacity: 1, duration: 0.04, ease: "power2.out",
     }, 0.64);
 
-    // "possibilities" — slide in from left
+    // Cycling words container — slide in from left (same as old "possibilities")
     scrollTl.to(poss, {
       x: 0, opacity: 1, duration: 0.05, ease: "power2.out",
     }, 0.66);
@@ -294,7 +381,6 @@ export default function IntroScene() {
     // 0.84–0.86: hold (big orange circle alone)
     // ══════════════════════════════════════════════
 
-    // 5a. Text out
     scrollTl.to(callIt1, {
       y: -30, opacity: 0, duration: 0.04, ease: "power2.in",
     }, 0.74);
@@ -348,65 +434,103 @@ export default function IntroScene() {
     scrollTl.set({}, {}, 0.96);
 
     // ══════════════════════════════════════════════
-    // Scene 7: Video zooms out slowly, orange circle alone again
-    // 0.96–1.04: video shrinks back to center smoothly
-    // Then hold on orange circle
+    // Scene 7: Gold circle fades in ON TOP of video
+    // 0.96–1.02: circle scales up and fades in, centered
+    // 1.02–1.12: hold (circle visible on video)
     // ══════════════════════════════════════════════
 
-    // 7a. Video zooms out slowly
-    scrollTl.to(videoWrap, {
-      scale: 0,
-      opacity: 0,
-      duration: 0.08,
-      ease: "sine.inOut",
+    scrollTl.to(goldCircle, {
+      opacity: 1, scale: 1, duration: 0.06, ease: "back.out(1.2)",
     }, 0.96);
 
-    // 7b. Pause video
+    // ── Hold: gold circle on video ──
+    scrollTl.set({}, {}, 1.02);
+
+    // 7b. Show text container
+    scrollTl.set(s7Text, { opacity: 1 }, 1.02);
+
+    // 7c. Headline lines animate in with stagger
+    const s7Headlines = s7Text.querySelectorAll(".s7__h-line");
+    s7Headlines.forEach((h) => gsap.set(h, { x: 40, opacity: 0 }));
+    scrollTl.to(s7Headlines[0], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.02);
+    scrollTl.to(s7Headlines[1], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.04);
+    scrollTl.to(s7Headlines[2], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.06);
+
+    // 7d. Scroll only the body content (not the headline) upward.
+    //     The headline stays fixed; the scroll-clip area clips overflow.
+    const s7Inner = s7Text.querySelector("[data-s7-inner]") as HTMLElement;
+    const s7Clip  = s7Text.querySelector(".s7__scroll-clip") as HTMLElement;
+    if (s7Inner && s7Clip) {
+      gsap.set(s7Inner, { y: 0 });
+      scrollTl.to(s7Inner, {
+        y: () => -(s7Inner.scrollHeight - s7Clip.offsetHeight),
+        duration: 0.50,
+        ease: "none",
+      }, 1.08);
+    }
+
+    // ── Hold: end of text scroll ──
+    scrollTl.set({}, {}, 1.62);
+
+    // 7d. Fade out text + circle
+    scrollTl.to(s7Text, {
+      opacity: 0, duration: 0.04, ease: "power2.in",
+    }, 1.56);
+    scrollTl.to(goldCircle, {
+      opacity: 0, scale: 0.8, duration: 0.04, ease: "power2.in",
+    }, 1.56);
+
+    // ══════════════════════════════════════════════
+    // Scene 8: Video zooms out slowly, orange circle alone again
+    // ══════════════════════════════════════════════
+    const s8Start = 1.62;
+
+    scrollTl.to(videoWrap, {
+      scale: 0, opacity: 0, duration: 0.08, ease: "sine.inOut",
+    }, s8Start);
+
     scrollTl.call(() => {
       video.pause();
-    }, [], 1.03);
+    }, [], s8Start + 0.07);
 
-    // Hold at end (orange circle alone)
-    scrollTl.set({}, {}, 1.1);
+    const s9Start = s8Start + 0.12;
+    scrollTl.set({}, {}, s9Start);
 
     // ══════════════════════════════════════════════
-    // Scene 8: Image collage appears on the gold circle
-    // 1.10–1.14: collage container fades/scales in
-    // 1.14–1.28: individual images stagger in
-    // 1.28–1.40: hold (collage visible, clickable)
+    // Scene 9: Image collage appears on the gold circle
     // ══════════════════════════════════════════════
 
-    // 8a. Collage container scales up
     scrollTl.to(collage, {
-      opacity: 1,
-      scale: 1,
-      duration: 0.04,
-      ease: "power2.out",
-    }, 1.10);
+      opacity: 1, scale: 1, duration: 0.04, ease: "power2.out",
+    }, s9Start);
 
-    // 8b. Stagger individual images in
     const collageItems = collage.querySelectorAll("[data-collage-item]");
     scrollTl.to(collageItems, {
-      opacity: 1,
-      duration: 0.02,
-      stagger: 0.004,
-      ease: "power2.out",
-    }, 1.12);
+      opacity: 1, duration: 0.02, stagger: 0.004, ease: "power2.out",
+    }, s9Start + 0.02);
 
-    // 8c. Enable pointer events after images are in
-    scrollTl.set(collage, { pointerEvents: "auto" }, 1.28);
+    scrollTl.set(collage, { pointerEvents: "auto" }, s9Start + 0.16);
 
-    // Hold with collage visible
-    scrollTl.set({}, {}, 1.40);
+    scrollTl.set({}, {}, s9Start + 0.20);
 
     const st = ScrollTrigger.create({
-      trigger: section, start: "top top", end: "+=1300%",
+      trigger: section, start: "top top", end: "+=2000%",
       pin: true, pinSpacing: true, anticipatePin: 1,
       scrub: 1, animation: scrollTl,
+      onUpdate: () => {
+        // Read actual timeline position — no fragile progress math
+        const t = scrollTl.time();
+        // Cycling active: after poss container slides in (0.70) until Scene 5 text-out finishes (0.80)
+        if (t >= 0.70 && t < 0.78) {
+          startCyclingRef.current();
+        } else {
+          stopCyclingRef.current();
+        }
+      },
     });
 
     document.fonts.ready.then(() => requestAnimationFrame(() => ScrollTrigger.refresh(true)));
-    return () => { autoTl.kill(); st.kill(); scrollTl.kill(); };
+    return () => { stopCyclingRef.current(); autoTl.kill(); st.kill(); scrollTl.kill(); };
   }, []);
 
   return (
@@ -449,9 +573,21 @@ export default function IntroScene() {
       {/* Scene 4 text — positioned around the gold circle */}
       <div className="intro__scene4-text" aria-hidden="true">
         <div ref={callIt1Ref} className="scene4__call-it scene4__call-it--top">Call it</div>
-        <div ref={capRef} className="scene4__big-text scene4__capabilities">capabilities</div>
+        <div ref={capRef} className="scene4__big-text scene4__capabilities">CAPABILITIES</div>
         <div ref={callIt2Ref} className="scene4__call-it scene4__call-it--bottom">Call it</div>
-        <div ref={possRef} className="scene4__big-text scene4__possibilities">possibilities</div>
+        <div ref={possRef} className="scene4__big-text scene4__possibilities">
+          <span className="scene4__cycle-wrap">
+            {CYCLING_WORDS.map((word, i) => (
+              <span
+                key={word}
+                ref={(el) => { if (el) cycleWordsRef.current[i] = el; }}
+                className="scene4__cycle-word"
+              >
+                {word}
+              </span>
+            ))}
+          </span>
+        </div>
       </div>
 
       {/* Video circle — zooms from center to cover the gold dot */}
@@ -466,7 +602,67 @@ export default function IntroScene() {
         />
       </div>
 
-      {/* Scene 8: Image collage — overlays the gold circle */}
+      {/* Gold circle overlay — appears on top of video */}
+      <div ref={goldCircleRef} className="intro__gold-circle" aria-hidden="true">
+        <svg viewBox="0 0 32.24 31.89" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,15.77c0,9.02,7.18,16.12,15.86,16.12,9.29,0,16.38-7.1,16.38-16.12S25.14,0,15.86,0C7.18,0,0,6.83,0,15.77h0Z" fill="#c3884f"/>
+        </svg>
+      </div>
+
+      {/* Scene 7 text — headline stays fixed, rest scrolls */}
+      <div ref={s7TextRef} className="intro__s7-text" aria-hidden="true">
+        {/* Headline — stays fixed, does NOT scroll */}
+        <div className="s7__headline-fixed">
+          <div className="s7__h-line">SCIENCE</div>
+          <div className="s7__h-line">STORIES</div>
+          <div className="s7__h-line">HUMAN IMPACT</div>
+        </div>
+        {/* Scrollable area — clips and scrolls up */}
+        <div className="s7__scroll-clip">
+          <div data-s7-inner className="s7__inner">
+            <div className="s7__section">
+              <h3 className="s7__label">MISSION</h3>
+              <p className="s7__para">To partner with ambitious brands and help them scale through insight-led solutions that build visibility, engagement, and measurable impact</p>
+            </div>
+
+            <div className="s7__section">
+              <h3 className="s7__label">VISION</h3>
+              <p className="s7__para">To shape the next chapter of brand growth in India through innovation, creativity and execution</p>
+            </div>
+
+            <div className="s7__section">
+              <h3 className="s7__label">VALUES</h3>
+            </div>
+
+            <div className="s7__value">
+              <strong>Integrity first</strong>
+              <span>We value honesty and transparency, building relationships based on trust and respect.</span>
+            </div>
+            <div className="s7__value">
+              <strong>Bold creativity</strong>
+              <span>We believe strong, intentional ideas move brands forward, and create impact that lasts.</span>
+            </div>
+            <div className="s7__value">
+              <strong>Purposeful practice</strong>
+              <span>We begin every approach with insight and a clear objective, aligning creativity with intent.</span>
+            </div>
+            <div className="s7__value">
+              <strong>Ownership</strong>
+              <span>We work with agility, take responsibility, and focus on results.</span>
+            </div>
+            <div className="s7__value">
+              <strong>United excellence</strong>
+              <span>We make great work happen by bringing diverse perspectives together.</span>
+            </div>
+            <div className="s7__value">
+              <strong>Continuous progress</strong>
+              <span>We learn, adapt, and evolve to stay ahead, and help our clients do the same.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Image collage — overlays the gold circle */}
       <div ref={collageRef} className="intro__collage">
         <ImageCollage />
       </div>
