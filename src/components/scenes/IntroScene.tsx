@@ -575,7 +575,7 @@ export default function IntroScene() {
       opacity: 1, duration: 0.02, stagger: 0.004, ease: "power2.out",
     }, s9Start + 0.02);
 
-    scrollTl.set(collage, { pointerEvents: "auto" }, s9Start + 0.16);
+    scrollTl.set(collage, { pointerEvents: "auto" }, s9Start + 0.04);
 
     scrollTl.set({}, {}, s9Start + 0.20);
 
