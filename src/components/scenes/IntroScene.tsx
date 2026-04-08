@@ -407,6 +407,9 @@ export default function IntroScene() {
       opacity: 1, scale: 1, duration: 0.06, ease: "back.out(1.2)",
     }, s7Start);
 
+    // Pause video when the gold circle / headline sequence begins
+    scrollTl.call(() => { video.pause(); }, [], s7Start);
+
     // ── Hold: gold circle on video ──
     const s7TextStart = s7Start + 0.06;
     scrollTl.set({}, {}, s7TextStart);
@@ -518,7 +521,6 @@ export default function IntroScene() {
               const valEl = val as HTMLElement;
               const valBottom = valEl.offsetTop + valEl.offsetHeight;
               const clipH = s7Clip.offsetHeight;
-              // Always at least mvHeight scrolled (Mission/Vision are out of view)
               return -Math.max(mvHeight(), valBottom - clipH);
             },
             duration: 0.04,
