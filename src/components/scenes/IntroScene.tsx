@@ -536,10 +536,39 @@ export default function IntroScene() {
       trigger: section, start: "top top", end: "+=2000%",
       pin: true, pinSpacing: true, anticipatePin: 1,
       scrub: 1, animation: scrollTl,
+      invalidateOnRefresh: true,
     });
 
-    document.fonts.ready.then(() => requestAnimationFrame(() => ScrollTrigger.refresh(true)));
-    return () => { autoTl.kill(); st.kill(); scrollTl.kill(); };
+    // Wait for fonts AND wordmark SVG images to have intrinsic dimensions.
+    // On production (Netlify CDN, cold cache) images may arrive after
+    // the initial layout pass, causing getBoundingClientRect() to return
+    // wrong values for the logo-target slot. We refresh once everything
+    // is ready, and add a safety net refresh after a short delay.
+    const imgEls = [left, right, tagline].filter(Boolean) as HTMLImageElement[];
+    const imgsReady = imgEls.map(
+      (img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              img.addEventListener("load", () => resolve(), { once: true });
+              img.addEventListener("error", () => resolve(), { once: true });
+            })
+    );
+
+    Promise.all([document.fonts.ready, ...imgsReady]).then(() => {
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh(true);
+        // Safety: some browsers (especially mobile Safari) need a
+        // second pass after the first paint with correct dimensions.
+        requestAnimationFrame(() => ScrollTrigger.refresh(true));
+      });
+    });
+
+    // Fallback: if images somehow stall (e.g. service worker), force
+    // a refresh after 2s so the layout is never permanently broken.
+    const safetyTimer = setTimeout(() => ScrollTrigger.refresh(true), 2000);
+
+    return () => { clearTimeout(safetyTimer); autoTl.kill(); st.kill(); scrollTl.kill(); };
   }, []);
 
   return (
