@@ -430,60 +430,105 @@ export default function IntroScene() {
     const s7BodyStart = s7TextStart + 0.14;
     scrollTl.set({}, {}, s7BodyStart);
 
-    // 7d. Section-by-section reveal
-    //     Each section/value fades in individually while the container
-    //     scrolls up in steps to keep the active item in view.
+    // 7d. Two-phase body reveal:
+    //     Phase A: Mission + Vision fade in together, hold
+    //     Phase B: Mission/Vision scroll out, VALUES title + 6 values reveal one-by-one
     const s7Inner = s7Text.querySelector("[data-s7-inner]") as HTMLElement;
     const s7Clip  = s7Text.querySelector(".s7__scroll-clip") as HTMLElement;
+    const s7MvGroup = s7Text.querySelector("[data-s7-mv]") as HTMLElement;
+    const s7ValuesGroup = s7Text.querySelector("[data-s7-values]") as HTMLElement;
 
     let s7EndTime = s7BodyStart + 0.10; // fallback
 
-    if (s7ScrollClip && s7Inner && s7Clip) {
+    if (s7ScrollClip && s7Inner && s7Clip && s7MvGroup && s7ValuesGroup) {
       // Show the scroll-clip container
       scrollTl.to(s7ScrollClip, { opacity: 1, duration: 0.04, ease: "power2.out" }, s7BodyStart);
       gsap.set(s7Inner, { y: 0 });
 
-      // Collect all scrollable sections: .s7__section and .s7__value
-      const s7Sections = s7Inner.querySelectorAll(".s7__section, .s7__value");
-      const sectionCount = s7Sections.length;
+      // Hide both groups initially
+      gsap.set(s7MvGroup, { opacity: 0, y: 20 });
+      gsap.set(s7ValuesGroup, { opacity: 0 });
 
-      // Each section gets a slice of timeline
-      const SECTION_STEP = 0.06;
-      const SECTION_START = s7BodyStart + 0.04;
+      // Collect value items inside the values group
+      const s7ValTitle = s7ValuesGroup.querySelector(".s7__section") as HTMLElement;
+      const s7ValueItems = s7ValuesGroup.querySelectorAll(".s7__value");
 
-      // Hide all sections initially
-      s7Sections.forEach((sec) => {
-        gsap.set(sec, { opacity: 0, y: 20 });
-      });
+      // Hide each value item individually
+      if (s7ValTitle) gsap.set(s7ValTitle, { opacity: 0, y: 20 });
+      s7ValueItems.forEach((v) => gsap.set(v, { opacity: 0, y: 20 }));
 
-      // Animate each section in sequence
-      s7Sections.forEach((sec, i) => {
-        const t = SECTION_START + i * SECTION_STEP;
+      // ── Phase A: Mission + Vision fade in together ──
+      const mvStart = s7BodyStart + 0.04;
+      scrollTl.to(s7MvGroup, {
+        opacity: 1, y: 0, duration: 0.04, ease: "power2.out",
+      }, mvStart);
 
-        // Fade + slide in this section
-        scrollTl.to(sec, {
+      // Hold: Mission + Vision visible
+      const mvHold = mvStart + 0.10;
+      scrollTl.set({}, {}, mvHold);
+
+      // ── Phase B: Scroll Mission/Vision out, bring Values in ──
+      const valTransition = mvHold;
+
+      // Make values group visible (items still hidden individually)
+      scrollTl.set(s7ValuesGroup, { opacity: 1 }, valTransition);
+
+      // Scroll the inner container up so Mission/Vision move out of the clip area.
+      // We lock the base offset here so later value-item scrolls only add to it,
+      // preventing any jump-down-then-up glitch.
+      const mvHeight = () => s7MvGroup.offsetHeight;
+
+      scrollTl.to(s7Inner, {
+        y: () => -mvHeight(),
+        duration: 0.06,
+        ease: "power2.inOut",
+      }, valTransition);
+
+      // Fade out Mission/Vision as they scroll up
+      scrollTl.to(s7MvGroup, {
+        opacity: 0, duration: 0.04, ease: "power2.in",
+      }, valTransition);
+
+      // VALUES title appears as the scroll settles
+      const valStart = valTransition + 0.05;
+      if (s7ValTitle) {
+        scrollTl.to(s7ValTitle, {
+          opacity: 1, y: 0, duration: 0.03, ease: "power2.out",
+        }, valStart);
+      }
+
+      // Each value item fades in one-by-one with scroll
+      const VALUE_STEP = 0.05;
+      const valueStart = valStart + 0.04;
+
+      s7ValueItems.forEach((val, i) => {
+        const t = valueStart + i * VALUE_STEP;
+
+        // Fade + slide in this value
+        scrollTl.to(val, {
           opacity: 1, y: 0, duration: 0.03, ease: "power2.out",
         }, t);
 
-        // Scroll the container up so this section stays in view
-        // (only needed after the first few items fill the clip area)
-        if (i > 1) {
-          const scrollAmount = () => {
-            const secEl = sec as HTMLElement;
-            const secBottom = secEl.offsetTop + secEl.offsetHeight;
-            const clipH = s7Clip.offsetHeight;
-            return Math.max(0, secBottom - clipH);
-          };
+        // Scroll the container up further to keep the active value in view.
+        // The y target always includes mvHeight as the base offset, so we
+        // never jump back toward 0 — we only ever increase the scroll.
+        if (i > 0) {
           scrollTl.to(s7Inner, {
-            y: () => -scrollAmount(),
+            y: () => {
+              const valEl = val as HTMLElement;
+              const valBottom = valEl.offsetTop + valEl.offsetHeight;
+              const clipH = s7Clip.offsetHeight;
+              // Always at least mvHeight scrolled (Mission/Vision are out of view)
+              return -Math.max(mvHeight(), valBottom - clipH);
+            },
             duration: 0.04,
             ease: "power1.inOut",
           }, t);
         }
       });
 
-      // Hold after last section
-      const s7SectionsEnd = SECTION_START + sectionCount * SECTION_STEP;
+      // Hold after last value
+      const s7SectionsEnd = valueStart + s7ValueItems.length * VALUE_STEP;
       scrollTl.set({}, {}, s7SectionsEnd + 0.04);
 
       // 7f. Fade out text + circle
@@ -658,43 +703,49 @@ export default function IntroScene() {
         {/* Scrollable area — clips and scrolls up */}
         <div className="s7__scroll-clip">
           <div data-s7-inner className="s7__inner">
-            <div className="s7__section">
-              <h3 className="s7__label">MISSION</h3>
-              <p className="s7__para">To partner with ambitious brands and help them scale through insight-led solutions that build visibility, engagement, and measurable impact</p>
+            {/* Mission + Vision — appear together as a group */}
+            <div data-s7-mv className="s7__mv-group">
+              <div className="s7__section">
+                <h3 className="s7__label">MISSION</h3>
+                <p className="s7__para">To partner with ambitious brands and help them scale through insight-led solutions that build visibility, engagement, and measurable impact</p>
+              </div>
+
+              <div className="s7__section">
+                <h3 className="s7__label">VISION</h3>
+                <p className="s7__para">To shape the next chapter of brand growth in India through innovation, creativity and execution</p>
+              </div>
             </div>
 
-            <div className="s7__section">
-              <h3 className="s7__label">VISION</h3>
-              <p className="s7__para">To shape the next chapter of brand growth in India through innovation, creativity and execution</p>
-            </div>
+            {/* Values — appear after Mission/Vision scroll out */}
+            <div data-s7-values className="s7__values-group">
+              <div className="s7__section">
+                <h3 className="s7__label">VALUES</h3>
+              </div>
 
-            <div className="s7__section">
-              <h3 className="s7__label">VALUES</h3>
-            </div>
-
-            <div className="s7__value">
-              <strong>Integrity first</strong>
-              <span>We value honesty and transparency, building relationships based on trust and respect.</span>
-            </div>
-            <div className="s7__value">
-              <strong>Bold creativity</strong>
-              <span>We believe strong, intentional ideas move brands forward, and create impact that lasts.</span>
-            </div>
-            <div className="s7__value">
-              <strong>Purposeful practice</strong>
-              <span>We begin every approach with insight and a clear objective, aligning creativity with intent.</span>
-            </div>
-            <div className="s7__value">
-              <strong>Ownership</strong>
-              <span>We work with agility, take responsibility, and focus on results.</span>
-            </div>
-            <div className="s7__value">
-              <strong>United excellence</strong>
-              <span>We make great work happen by bringing diverse perspectives together.</span>
-            </div>
-            <div className="s7__value">
-              <strong>Continuous progress</strong>
-              <span>We learn, adapt, and evolve to stay ahead, and help our clients do the same.</span>
+              <div className="s7__value">
+                <strong>Integrity first</strong>
+                <span>We value honesty and transparency, building relationships based on trust and respect.</span>
+              </div>
+              <div className="s7__value">
+                <strong>Bold creativity</strong>
+                <span>We believe strong, intentional ideas move brands forward, and create impact that lasts.</span>
+              </div>
+              <div className="s7__value">
+                <strong>Purposeful practice</strong>
+                <span>We begin every approach with insight and a clear objective, aligning creativity with intent.</span>
+              </div>
+              <div className="s7__value">
+                <strong>Ownership</strong>
+                <span>We work with agility, take responsibility, and focus on results.</span>
+              </div>
+              <div className="s7__value">
+                <strong>United excellence</strong>
+                <span>We make great work happen by bringing diverse perspectives together.</span>
+              </div>
+              <div className="s7__value">
+                <strong>Continuous progress</strong>
+                <span>We learn, adapt, and evolve to stay ahead, and help our clients do the same.</span>
+              </div>
             </div>
           </div>
         </div>
