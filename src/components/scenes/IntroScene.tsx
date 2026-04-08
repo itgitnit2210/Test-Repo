@@ -452,11 +452,24 @@ export default function IntroScene() {
     // 7c. Headline lines animate in with stagger
     const s7Headlines = s7Text.querySelectorAll(".s7__h-line");
     s7Headlines.forEach((h) => gsap.set(h, { x: 40, opacity: 0 }));
+
+    // 7c-i. Hide body content until headlines are done
+    const s7ScrollClip = s7Text.querySelector(".s7__scroll-clip") as HTMLElement;
+    if (s7ScrollClip) gsap.set(s7ScrollClip, { opacity: 0 });
+
     scrollTl.to(s7Headlines[0], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.02);
     scrollTl.to(s7Headlines[1], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.04);
     scrollTl.to(s7Headlines[2], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.06);
 
-    // 7d. Scroll only the body content (not the headline) upward.
+    // ── Hold: headline fully visible before body appears ──
+    scrollTl.set({}, {}, 1.16);
+
+    // 7d. Fade in body content after headlines are complete
+    if (s7ScrollClip) {
+      scrollTl.to(s7ScrollClip, { opacity: 1, duration: 0.04, ease: "power2.out" }, 1.16);
+    }
+
+    // 7e. Scroll only the body content (not the headline) upward.
     //     The headline stays fixed; the scroll-clip area clips overflow.
     const s7Inner = s7Text.querySelector("[data-s7-inner]") as HTMLElement;
     const s7Clip  = s7Text.querySelector(".s7__scroll-clip") as HTMLElement;
@@ -466,24 +479,24 @@ export default function IntroScene() {
         y: () => -(s7Inner.scrollHeight - s7Clip.offsetHeight),
         duration: 0.50,
         ease: "none",
-      }, 1.08);
+      }, 1.20);
     }
 
     // ── Hold: end of text scroll ──
-    scrollTl.set({}, {}, 1.62);
+    scrollTl.set({}, {}, 1.72);
 
-    // 7d. Fade out text + circle
+    // 7e. Fade out text + circle
     scrollTl.to(s7Text, {
       opacity: 0, duration: 0.04, ease: "power2.in",
-    }, 1.56);
+    }, 1.66);
     scrollTl.to(goldCircle, {
       opacity: 0, scale: 0.8, duration: 0.04, ease: "power2.in",
-    }, 1.56);
+    }, 1.66);
 
     // ══════════════════════════════════════════════
     // Scene 8: Video zooms out slowly, orange circle alone again
     // ══════════════════════════════════════════════
-    const s8Start = 1.62;
+    const s8Start = 1.72;
 
     scrollTl.to(videoWrap, {
       scale: 0, opacity: 0, duration: 0.08, ease: "sine.inOut",
