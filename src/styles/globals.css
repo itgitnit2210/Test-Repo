@@ -446,10 +446,22 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   flex: 1;
   overflow: hidden;
   position: relative;
+  -webkit-overflow-scrolling: touch;
 }
 
 .s7__inner {
   will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.s7__mv-group,
+.s7__values-group {
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .s7__h-line {

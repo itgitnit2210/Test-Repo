@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import "@/styles/globals.css";
 import ScrollProgress from "@/components/ui/ScrollProgress";
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "Exicon Group — Healthcare Consulting & Media Solutions",
@@ -19,7 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <link rel="preload" href="/fonts/heavitas.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/bahnschrift-light.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/bahnschrift-regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/bahnschrift-semibold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
       <body>
         {/*

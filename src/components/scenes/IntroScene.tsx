@@ -512,21 +512,21 @@ export default function IntroScene() {
           opacity: 1, y: 0, duration: 0.03, ease: "power2.out",
         }, t);
 
-        // Scroll the container up further to keep the active value in view.
-        // The y target always includes mvHeight as the base offset, so we
-        // never jump back toward 0 — we only ever increase the scroll.
-        if (i > 0) {
-          scrollTl.to(s7Inner, {
-            y: () => {
-              const valEl = val as HTMLElement;
-              const valBottom = valEl.offsetTop + valEl.offsetHeight;
-              const clipH = s7Clip.offsetHeight;
-              return -Math.max(mvHeight(), valBottom - clipH);
-            },
-            duration: 0.04,
-            ease: "power1.inOut",
-          }, t);
-        }
+        // Scroll the container up to keep the active value in view.
+        // valEl.offsetTop is relative to s7Inner (includes mv-group height
+        // + values-group offset). We ensure we never scroll less than
+        // mvHeight so Mission/Vision stay out of frame.
+        scrollTl.to(s7Inner, {
+          y: () => {
+            const valEl = val as HTMLElement;
+            // Bottom of this value relative to s7Inner's top
+            const valBottom = valEl.offsetTop + valEl.offsetHeight + s7ValuesGroup.offsetTop;
+            const clipH = s7Clip.offsetHeight;
+            return -Math.max(mvHeight(), valBottom - clipH);
+          },
+          duration: 0.04,
+          ease: "power1.inOut",
+        }, t);
       });
 
       // Hold after last value

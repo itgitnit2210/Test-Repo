@@ -202,7 +202,7 @@ function CollagePopup({ item, onClose }: { item: CollageItem | null; onClose: ()
           onClick={handleClose}
           aria-label="Close popup"
           style={{
-            position: "absolute", top: "12%", right: "12%", zIndex: 10,
+            position: "absolute", top: "18%", right: "18%", zIndex: 10,
             width: "clamp(28px, 5vw, 36px)", height: "clamp(28px, 5vw, 36px)",
             borderRadius: "50%", border: "none",
             background: "rgba(0,0,0,0.5)", color: "#fff", cursor: "pointer",
