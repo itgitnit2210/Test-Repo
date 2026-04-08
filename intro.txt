@@ -76,6 +76,8 @@ export default function IntroScene() {
   const cycleActiveRef = useRef(false);
   const videoWrapRef  = useRef<HTMLDivElement>(null);
   const videoRef      = useRef<HTMLVideoElement>(null);
+  const goldCircleRef = useRef<HTMLDivElement>(null);
+  const s7TextRef     = useRef<HTMLDivElement>(null);
   const collageRef    = useRef<HTMLDivElement>(null);
 
   const [loading, setLoading] = useState(true);
@@ -159,11 +161,13 @@ export default function IntroScene() {
     const poss       = possRef.current;
     const videoWrap  = videoWrapRef.current;
     const video      = videoRef.current;
+    const goldCircle = goldCircleRef.current;
+    const s7Text     = s7TextRef.current;
     const collage    = collageRef.current;
     if (!section || !outline || !solid || !logoWrap || !iconsDiv ||
         !wordmark || !left || !right || !tagline || !logoTarget ||
         !shiftGroup || !iDot || !callIt1 || !cap || !callIt2 || !poss ||
-        !videoWrap || !video || !collage) return;
+        !videoWrap || !video || !goldCircle || !s7Text || !collage) return;
 
     const particlesWrap = section.querySelector(".intro__particles") as HTMLElement;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -177,6 +181,8 @@ export default function IntroScene() {
     gsap.set(iDot, { opacity: 0 });
     gsap.set([callIt1, cap, callIt2, poss], { opacity: 0 });
     gsap.set(videoWrap, { opacity: 0, scale: 0 });
+    gsap.set(goldCircle, { opacity: 0, scale: 0.5 });
+    gsap.set(s7Text, { opacity: 0 });
     gsap.set(collage, { opacity: 0, scale: 0.5 });
 
     setLoading(false);
@@ -428,59 +434,100 @@ export default function IntroScene() {
     scrollTl.set({}, {}, 0.96);
 
     // ══════════════════════════════════════════════
-    // Scene 7: Video zooms out slowly, orange circle alone again
-    // 0.96–1.04: video shrinks back to center smoothly
-    // Then hold on orange circle
+    // Scene 7: Gold circle fades in ON TOP of video
+    // 0.96–1.02: circle scales up and fades in, centered
+    // 1.02–1.12: hold (circle visible on video)
     // ══════════════════════════════════════════════
 
-    // 7a. Video zooms out slowly
-    scrollTl.to(videoWrap, {
-      scale: 0,
-      opacity: 0,
-      duration: 0.08,
-      ease: "sine.inOut",
+    scrollTl.to(goldCircle, {
+      opacity: 1, scale: 1, duration: 0.06, ease: "back.out(1.2)",
     }, 0.96);
 
-    // 7b. Pause video
+    // ── Hold: gold circle on video ──
+    scrollTl.set({}, {}, 1.02);
+
+    // 7b. Show text container
+    scrollTl.set(s7Text, { opacity: 1 }, 1.02);
+
+    // 7c. Headline lines animate in with stagger
+    const s7Headlines = s7Text.querySelectorAll(".s7__h-line");
+    s7Headlines.forEach((h) => gsap.set(h, { x: 40, opacity: 0 }));
+
+    // 7c-i. Hide body content until headlines are done
+    const s7ScrollClip = s7Text.querySelector(".s7__scroll-clip") as HTMLElement;
+    if (s7ScrollClip) gsap.set(s7ScrollClip, { opacity: 0 });
+
+    scrollTl.to(s7Headlines[0], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.02);
+    scrollTl.to(s7Headlines[1], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.04);
+    scrollTl.to(s7Headlines[2], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.06);
+
+    // ── Hold: headline fully visible before body appears ──
+    scrollTl.set({}, {}, 1.16);
+
+    // 7d. Fade in body content after headlines are complete
+    if (s7ScrollClip) {
+      scrollTl.to(s7ScrollClip, { opacity: 1, duration: 0.04, ease: "power2.out" }, 1.16);
+    }
+
+    // 7e. Scroll only the body content (not the headline) upward.
+    //     The headline stays fixed; the scroll-clip area clips overflow.
+    const s7Inner = s7Text.querySelector("[data-s7-inner]") as HTMLElement;
+    const s7Clip  = s7Text.querySelector(".s7__scroll-clip") as HTMLElement;
+    if (s7Inner && s7Clip) {
+      gsap.set(s7Inner, { y: 0 });
+      scrollTl.to(s7Inner, {
+        y: () => -(s7Inner.scrollHeight - s7Clip.offsetHeight),
+        duration: 0.50,
+        ease: "none",
+      }, 1.20);
+    }
+
+    // ── Hold: end of text scroll ──
+    scrollTl.set({}, {}, 1.72);
+
+    // 7e. Fade out text + circle
+    scrollTl.to(s7Text, {
+      opacity: 0, duration: 0.04, ease: "power2.in",
+    }, 1.66);
+    scrollTl.to(goldCircle, {
+      opacity: 0, scale: 0.8, duration: 0.04, ease: "power2.in",
+    }, 1.66);
+
+    // ══════════════════════════════════════════════
+    // Scene 8: Video zooms out slowly, orange circle alone again
+    // ══════════════════════════════════════════════
+    const s8Start = 1.72;
+
+    scrollTl.to(videoWrap, {
+      scale: 0, opacity: 0, duration: 0.08, ease: "sine.inOut",
+    }, s8Start);
+
     scrollTl.call(() => {
       video.pause();
-    }, [], 1.03);
+    }, [], s8Start + 0.07);
 
-    // Hold at end (orange circle alone)
-    scrollTl.set({}, {}, 1.1);
+    const s9Start = s8Start + 0.12;
+    scrollTl.set({}, {}, s9Start);
 
     // ══════════════════════════════════════════════
-    // Scene 8: Image collage appears on the gold circle
-    // 1.10–1.14: collage container fades/scales in
-    // 1.14–1.28: individual images stagger in
-    // 1.28–1.40: hold (collage visible, clickable)
+    // Scene 9: Image collage appears on the gold circle
     // ══════════════════════════════════════════════
 
-    // 8a. Collage container scales up
     scrollTl.to(collage, {
-      opacity: 1,
-      scale: 1,
-      duration: 0.04,
-      ease: "power2.out",
-    }, 1.10);
+      opacity: 1, scale: 1, duration: 0.04, ease: "power2.out",
+    }, s9Start);
 
-    // 8b. Stagger individual images in
     const collageItems = collage.querySelectorAll("[data-collage-item]");
     scrollTl.to(collageItems, {
-      opacity: 1,
-      duration: 0.02,
-      stagger: 0.004,
-      ease: "power2.out",
-    }, 1.12);
+      opacity: 1, duration: 0.02, stagger: 0.004, ease: "power2.out",
+    }, s9Start + 0.02);
 
-    // 8c. Enable pointer events after images are in
-    scrollTl.set(collage, { pointerEvents: "auto" }, 1.28);
+    scrollTl.set(collage, { pointerEvents: "auto" }, s9Start + 0.16);
 
-    // Hold with collage visible
-    scrollTl.set({}, {}, 1.40);
+    scrollTl.set({}, {}, s9Start + 0.20);
 
     const st = ScrollTrigger.create({
-      trigger: section, start: "top top", end: "+=1300%",
+      trigger: section, start: "top top", end: "+=2000%",
       pin: true, pinSpacing: true, anticipatePin: 1,
       scrub: 1, animation: scrollTl,
       onUpdate: () => {
@@ -568,7 +615,67 @@ export default function IntroScene() {
         />
       </div>
 
-      {/* Scene 8: Image collage — overlays the gold circle */}
+      {/* Gold circle overlay — appears on top of video */}
+      <div ref={goldCircleRef} className="intro__gold-circle" aria-hidden="true">
+        <svg viewBox="0 0 32.24 31.89" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,15.77c0,9.02,7.18,16.12,15.86,16.12,9.29,0,16.38-7.1,16.38-16.12S25.14,0,15.86,0C7.18,0,0,6.83,0,15.77h0Z" fill="#c3884f"/>
+        </svg>
+      </div>
+
+      {/* Scene 7 text — headline stays fixed, rest scrolls */}
+      <div ref={s7TextRef} className="intro__s7-text" aria-hidden="true">
+        {/* Headline — stays fixed, does NOT scroll */}
+        <div className="s7__headline-fixed">
+          <div className="s7__h-line">SCIENCE</div>
+          <div className="s7__h-line">STORIES</div>
+          <div className="s7__h-line">HUMAN IMPACT</div>
+        </div>
+        {/* Scrollable area — clips and scrolls up */}
+        <div className="s7__scroll-clip">
+          <div data-s7-inner className="s7__inner">
+            <div className="s7__section">
+              <h3 className="s7__label">MISSION</h3>
+              <p className="s7__para">To partner with ambitious brands and help them scale through insight-led solutions that build visibility, engagement, and measurable impact</p>
+            </div>
+
+            <div className="s7__section">
+              <h3 className="s7__label">VISION</h3>
+              <p className="s7__para">To shape the next chapter of brand growth in India through innovation, creativity and execution</p>
+            </div>
+
+            <div className="s7__section">
+              <h3 className="s7__label">VALUES</h3>
+            </div>
+
+            <div className="s7__value">
+              <strong>Integrity first</strong>
+              <span>We value honesty and transparency, building relationships based on trust and respect.</span>
+            </div>
+            <div className="s7__value">
+              <strong>Bold creativity</strong>
+              <span>We believe strong, intentional ideas move brands forward, and create impact that lasts.</span>
+            </div>
+            <div className="s7__value">
+              <strong>Purposeful practice</strong>
+              <span>We begin every approach with insight and a clear objective, aligning creativity with intent.</span>
+            </div>
+            <div className="s7__value">
+              <strong>Ownership</strong>
+              <span>We work with agility, take responsibility, and focus on results.</span>
+            </div>
+            <div className="s7__value">
+              <strong>United excellence</strong>
+              <span>We make great work happen by bringing diverse perspectives together.</span>
+            </div>
+            <div className="s7__value">
+              <strong>Continuous progress</strong>
+              <span>We learn, adapt, and evolve to stay ahead, and help our clients do the same.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Image collage — overlays the gold circle */}
       <div ref={collageRef} className="intro__collage">
         <ImageCollage />
       </div>

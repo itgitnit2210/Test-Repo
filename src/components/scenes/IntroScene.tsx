@@ -71,9 +71,6 @@ export default function IntroScene() {
   const callIt2Ref    = useRef<HTMLDivElement>(null);
   const possRef       = useRef<HTMLDivElement>(null);
   const cycleWordsRef = useRef<HTMLSpanElement[]>([]);
-  const cycleIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const cycleIndexRef = useRef(0);
-  const cycleActiveRef = useRef(false);
   const videoWrapRef  = useRef<HTMLDivElement>(null);
   const videoRef      = useRef<HTMLVideoElement>(null);
   const goldCircleRef = useRef<HTMLDivElement>(null);
@@ -81,63 +78,6 @@ export default function IntroScene() {
   const collageRef    = useRef<HTMLDivElement>(null);
 
   const [loading, setLoading] = useState(true);
-
-  // Store start/stop in refs so ScrollTrigger onUpdate always sees latest
-  const startCyclingRef = useRef<() => void>(() => {});
-  const stopCyclingRef = useRef<() => void>(() => {});
-
-  useEffect(() => {
-    startCyclingRef.current = () => {
-      if (cycleActiveRef.current) return;
-      cycleActiveRef.current = true;
-      cycleIndexRef.current = 0;
-
-      const words = cycleWordsRef.current;
-
-      cycleIntervalRef.current = setInterval(() => {
-        const current = cycleIndexRef.current;
-        const next = (current + 1) % CYCLING_WORDS.length;
-        const currentEl = words[current];
-        const nextEl = words[next];
-
-        if (currentEl && nextEl) {
-          const h = currentEl.offsetHeight || 80;
-          // Current word slides up and out
-          gsap.to(currentEl, {
-            y: -h,
-            opacity: 0,
-            duration: 0.5,
-            ease: "power2.inOut",
-          });
-          // Next word slides up from below into view
-          gsap.fromTo(nextEl,
-            { y: h, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.5, ease: "power2.inOut" }
-          );
-        }
-
-        cycleIndexRef.current = next;
-      }, 1800);
-    };
-
-    stopCyclingRef.current = () => {
-      if (!cycleActiveRef.current) return;
-      cycleActiveRef.current = false;
-      if (cycleIntervalRef.current) {
-        clearInterval(cycleIntervalRef.current);
-        cycleIntervalRef.current = null;
-      }
-      // Reset to "possibilities" (index 0) visible
-      const words = cycleWordsRef.current;
-      words.forEach((w, i) => {
-        if (!w) return;
-        gsap.set(w, { y: 0, opacity: i === 0 ? 1 : 0 });
-      });
-      cycleIndexRef.current = 0;
-    };
-
-    return () => { stopCyclingRef.current(); };
-  }, []);
 
   useIsomorphicLayoutEffect(() => {
     window.scrollTo(0, 0);
@@ -341,14 +281,11 @@ export default function IntroScene() {
     gsap.set(cap,     { x: -60, opacity: 0 });
     gsap.set(callIt2, { y: -20, opacity: 0 });
     gsap.set(poss,    { x: -60, opacity: 0 });
-    // "possibilities" (index 0) visible in place; rest hidden below
-    cycleWordsRef.current.forEach((w, i) => {
+    // All cycling words start hidden
+    const words = cycleWordsRef.current;
+    words.forEach((w) => {
       if (!w) return;
-      if (i === 0) {
-        gsap.set(w, { y: 0, opacity: 1 });
-      } else {
-        gsap.set(w, { y: 0, opacity: 0 });
-      }
+      gsap.set(w, { y: 0, opacity: 0 });
     });
 
     // "Call it" top — fade in
@@ -366,36 +303,65 @@ export default function IntroScene() {
       y: 0, opacity: 1, duration: 0.04, ease: "power2.out",
     }, 0.64);
 
-    // Cycling words container — slide in from left (same as old "possibilities")
+    // Cycling words container — slide in from left
     scrollTl.to(poss, {
       x: 0, opacity: 1, duration: 0.05, ease: "power2.out",
     }, 0.66);
 
-    // ── Scene 4 hold ──
-    scrollTl.set({}, {}, 0.74);
+    // ── Scene 4: Scroll-driven word cycling ──
+    // Each word gets 0.03 of timeline with smooth crossfade
+    // 8 words × 0.03 = 0.24 total (0.68 → 0.92)
+    const WORD_STEP = 0.03;
+    const WORD_START = 0.68;
+
+    // Show first word (POSSIBILITIES) — gentle fade in
+    if (words[0]) {
+      scrollTl.to(words[0], { opacity: 1, duration: 0.02, ease: "power1.out" }, WORD_START);
+    }
+
+    // Transition through remaining words on scroll
+    for (let i = 1; i < CYCLING_WORDS.length; i++) {
+      const t = WORD_START + i * WORD_STEP;
+      const prev = words[i - 1];
+      const curr = words[i];
+      if (prev) {
+        // Previous word — gentle slide up and fade out
+        scrollTl.to(prev, { y: -30, opacity: 0, duration: 0.02, ease: "power1.inOut" }, t);
+      }
+      if (curr) {
+        // Current word — slides up from below, overlaps with outgoing
+        scrollTl.fromTo(curr,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.02, ease: "power1.inOut" },
+          t + 0.005
+        );
+      }
+    }
+
+    // ── Scene 4 hold — last word visible ──
+    const scene4End = WORD_START + CYCLING_WORDS.length * WORD_STEP;
+    scrollTl.set({}, {}, scene4End);
 
     // ══════════════════════════════════════════════
     // Scene 5: Text out → orange circle zooms bigger
-    // 0.74–0.78: text fades/slides out
-    // 0.76–0.84: circle scales up
-    // 0.84–0.86: hold (big orange circle alone)
     // ══════════════════════════════════════════════
+    const s5Start = scene4End + 0.02;
 
     scrollTl.to(callIt1, {
       y: -30, opacity: 0, duration: 0.04, ease: "power2.in",
-    }, 0.74);
+    }, s5Start);
 
     scrollTl.to(cap, {
       x: -80, opacity: 0, duration: 0.05, ease: "power2.in",
-    }, 0.74);
+    }, s5Start);
 
     scrollTl.to(callIt2, {
       y: 30, opacity: 0, duration: 0.04, ease: "power2.in",
-    }, 0.76);
+    }, s5Start + 0.02);
 
     scrollTl.to(poss, {
       x: -80, opacity: 0, duration: 0.05, ease: "power2.in",
-    }, 0.76);
+    }, s5Start + 0.02);
 
     // 5b. Orange circle zooms bigger
     scrollTl.to(iDot, {
@@ -406,15 +372,14 @@ export default function IntroScene() {
       },
       duration: 0.08,
       ease: "power2.inOut",
-    }, 0.76);
+    }, s5Start + 0.02);
 
     // ── Hold: big orange circle alone ──
-    scrollTl.set({}, {}, 0.86);
+    const s6Start = s5Start + 0.14;
+    scrollTl.set({}, {}, s6Start);
 
     // ══════════════════════════════════════════════
     // Scene 6: Video zooms in slowly over the orange circle
-    // 0.86–0.94: video scales from 0 to 1, covering the circle
-    // 0.94–0.96: hold with video visible
     // ══════════════════════════════════════════════
 
     // 6a. Video zooms in slowly
@@ -423,31 +388,31 @@ export default function IntroScene() {
       scale: 1,
       duration: 0.08,
       ease: "sine.inOut",
-    }, 0.86);
+    }, s6Start);
 
     // 6b. Start video playback
     scrollTl.call(() => {
       video.play().catch(() => {});
-    }, [], 0.88);
+    }, [], s6Start + 0.02);
 
     // ── Hold: video playing ──
-    scrollTl.set({}, {}, 0.96);
+    const s7Start = s6Start + 0.10;
+    scrollTl.set({}, {}, s7Start);
 
     // ══════════════════════════════════════════════
     // Scene 7: Gold circle fades in ON TOP of video
-    // 0.96–1.02: circle scales up and fades in, centered
-    // 1.02–1.12: hold (circle visible on video)
     // ══════════════════════════════════════════════
 
     scrollTl.to(goldCircle, {
       opacity: 1, scale: 1, duration: 0.06, ease: "back.out(1.2)",
-    }, 0.96);
+    }, s7Start);
 
     // ── Hold: gold circle on video ──
-    scrollTl.set({}, {}, 1.02);
+    const s7TextStart = s7Start + 0.06;
+    scrollTl.set({}, {}, s7TextStart);
 
     // 7b. Show text container
-    scrollTl.set(s7Text, { opacity: 1 }, 1.02);
+    scrollTl.set(s7Text, { opacity: 1 }, s7TextStart);
 
     // 7c. Headline lines animate in with stagger
     const s7Headlines = s7Text.querySelectorAll(".s7__h-line");
@@ -457,16 +422,17 @@ export default function IntroScene() {
     const s7ScrollClip = s7Text.querySelector(".s7__scroll-clip") as HTMLElement;
     if (s7ScrollClip) gsap.set(s7ScrollClip, { opacity: 0 });
 
-    scrollTl.to(s7Headlines[0], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.02);
-    scrollTl.to(s7Headlines[1], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.04);
-    scrollTl.to(s7Headlines[2], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 1.06);
+    scrollTl.to(s7Headlines[0], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, s7TextStart);
+    scrollTl.to(s7Headlines[1], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, s7TextStart + 0.02);
+    scrollTl.to(s7Headlines[2], { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, s7TextStart + 0.04);
 
     // ── Hold: headline fully visible before body appears ──
-    scrollTl.set({}, {}, 1.16);
+    const s7BodyStart = s7TextStart + 0.14;
+    scrollTl.set({}, {}, s7BodyStart);
 
     // 7d. Fade in body content after headlines are complete
     if (s7ScrollClip) {
-      scrollTl.to(s7ScrollClip, { opacity: 1, duration: 0.04, ease: "power2.out" }, 1.16);
+      scrollTl.to(s7ScrollClip, { opacity: 1, duration: 0.04, ease: "power2.out" }, s7BodyStart);
     }
 
     // 7e. Scroll only the body content (not the headline) upward.
@@ -479,24 +445,25 @@ export default function IntroScene() {
         y: () => -(s7Inner.scrollHeight - s7Clip.offsetHeight),
         duration: 0.50,
         ease: "none",
-      }, 1.20);
+      }, s7BodyStart + 0.02);
     }
 
     // ── Hold: end of text scroll ──
-    scrollTl.set({}, {}, 1.72);
+    const s7FadeOut = s7BodyStart + 0.54;
+    scrollTl.set({}, {}, s7FadeOut + 0.06);
 
-    // 7e. Fade out text + circle
+    // 7f. Fade out text + circle
     scrollTl.to(s7Text, {
       opacity: 0, duration: 0.04, ease: "power2.in",
-    }, 1.66);
+    }, s7FadeOut);
     scrollTl.to(goldCircle, {
       opacity: 0, scale: 0.8, duration: 0.04, ease: "power2.in",
-    }, 1.66);
+    }, s7FadeOut);
 
     // ══════════════════════════════════════════════
     // Scene 8: Video zooms out slowly, orange circle alone again
     // ══════════════════════════════════════════════
-    const s8Start = 1.72;
+    const s8Start = s7FadeOut + 0.06;
 
     scrollTl.to(videoWrap, {
       scale: 0, opacity: 0, duration: 0.08, ease: "sine.inOut",
@@ -530,20 +497,10 @@ export default function IntroScene() {
       trigger: section, start: "top top", end: "+=2000%",
       pin: true, pinSpacing: true, anticipatePin: 1,
       scrub: 1, animation: scrollTl,
-      onUpdate: () => {
-        // Read actual timeline position — no fragile progress math
-        const t = scrollTl.time();
-        // Cycling active: after poss container slides in (0.70) until Scene 5 text-out finishes (0.80)
-        if (t >= 0.70 && t < 0.78) {
-          startCyclingRef.current();
-        } else {
-          stopCyclingRef.current();
-        }
-      },
     });
 
     document.fonts.ready.then(() => requestAnimationFrame(() => ScrollTrigger.refresh(true)));
-    return () => { stopCyclingRef.current(); autoTl.kill(); st.kill(); scrollTl.kill(); };
+    return () => { autoTl.kill(); st.kill(); scrollTl.kill(); };
   }, []);
 
   return (
@@ -685,3 +642,4 @@ export default function IntroScene() {
     </section>
   );
 }
+
