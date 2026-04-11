@@ -8,6 +8,7 @@ import LogoOutline from "./LogoOutline";
 import LogoSolid from "./LogoSolid";
 import NavOrbit from "./NavOrbit";
 import ImageCollage from "./ImageCollage";
+import BrandEcosystem from "./BrandEcosystem";
 
 const CYCLING_WORDS = [
   "POSSIBILITIES",
@@ -76,6 +77,7 @@ export default function IntroScene() {
   const goldCircleRef = useRef<HTMLDivElement>(null);
   const s7TextRef     = useRef<HTMLDivElement>(null);
   const collageRef    = useRef<HTMLDivElement>(null);
+  const brandEcoRef   = useRef<HTMLDivElement>(null);
 
   const [loading, setLoading] = useState(true);
 
@@ -104,10 +106,11 @@ export default function IntroScene() {
     const goldCircle = goldCircleRef.current;
     const s7Text     = s7TextRef.current;
     const collage    = collageRef.current;
+    const brandEco   = brandEcoRef.current;
     if (!section || !outline || !solid || !logoWrap || !iconsDiv ||
         !wordmark || !left || !right || !tagline || !logoTarget ||
         !shiftGroup || !iDot || !callIt1 || !cap || !callIt2 || !poss ||
-        !videoWrap || !video || !goldCircle || !s7Text || !collage) return;
+        !videoWrap || !video || !goldCircle || !s7Text || !collage || !brandEco) return;
 
     const particlesWrap = section.querySelector(".intro__particles") as HTMLElement;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -124,6 +127,7 @@ export default function IntroScene() {
     gsap.set(goldCircle, { opacity: 0, scale: 0.5 });
     gsap.set(s7Text, { opacity: 0 });
     gsap.set(collage, { opacity: 0, scale: 0.5 });
+    gsap.set(brandEco, { opacity: 0 });
 
     setLoading(false);
 
@@ -577,10 +581,78 @@ export default function IntroScene() {
 
     scrollTl.set(collage, { pointerEvents: "auto" }, s9Start + 0.04);
 
-    scrollTl.set({}, {}, s9Start + 0.20);
+    scrollTl.set({}, {}, s9Start + 0.16);
+
+    // ══════════════════════════════════════════════
+    // Scene 10: Brand Ecosystem — collage fades out,
+    // orbit rings draw on, brand logos appear
+    // ══════════════════════════════════════════════
+    const s10Start = s9Start + 0.16;
+
+    // 10a. Fade out collage + i-dot
+    scrollTl.to(collage, {
+      opacity: 0, scale: 0.8, duration: 0.04, ease: "power2.in",
+    }, s10Start);
+    scrollTl.to(iDot, {
+      opacity: 0, duration: 0.04, ease: "power2.in",
+    }, s10Start);
+
+    // 10b. Fade in brand ecosystem container
+    scrollTl.to(brandEco, {
+      opacity: 1, duration: 0.04, ease: "power2.out",
+    }, s10Start + 0.04);
+
+    // 10c. Draw rings on with stagger
+    const ecoRings = brandEco.querySelectorAll("[data-eco-ring]");
+    ecoRings.forEach((ring) => {
+      const el = ring as SVGCircleElement;
+      const len = el.getTotalLength();
+      gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
+    });
+    scrollTl.to(ecoRings, {
+      strokeDashoffset: 0,
+      duration: 0.08,
+      stagger: 0.01,
+      ease: "power2.inOut",
+    }, s10Start + 0.05);
+
+    // 10d. Fade in center logo
+    const ecoLogo = brandEco.querySelector("[data-eco-logo]");
+    if (ecoLogo) {
+      gsap.set(ecoLogo, { opacity: 0 });
+      scrollTl.to(ecoLogo, {
+        opacity: 1, duration: 0.04, ease: "power2.out",
+      }, s10Start + 0.10);
+    }
+
+    // 10e. Fade in brand dots + connector lines with stagger
+    const ecoBrands = brandEco.querySelectorAll("[data-eco-brand]");
+    ecoBrands.forEach((b) => gsap.set(b, { opacity: 0 }));
+    scrollTl.to(ecoBrands, {
+      opacity: 1, duration: 0.03, stagger: 0.02, ease: "power2.out",
+    }, s10Start + 0.12);
+
+    // 10f. Slide in brand logo labels with stagger
+    const ecoLabels = brandEco.querySelectorAll("[data-eco-label]");
+    ecoLabels.forEach((l) => gsap.set(l, { opacity: 0, y: 15 }));
+    scrollTl.to(ecoLabels, {
+      opacity: 1, y: 0, duration: 0.03, stagger: 0.02, ease: "back.out(1.3)",
+    }, s10Start + 0.14);
+
+    // 10g. Fade in services tagline
+    const ecoServices = brandEco.querySelector("[data-eco-services]");
+    if (ecoServices) {
+      gsap.set(ecoServices, { opacity: 0, y: 15 });
+      scrollTl.to(ecoServices, {
+        opacity: 1, y: 0, duration: 0.04, ease: "power2.out",
+      }, s10Start + 0.18);
+    }
+
+    // Hold: brand ecosystem fully visible
+    scrollTl.set({}, {}, s10Start + 0.30);
 
     const st = ScrollTrigger.create({
-      trigger: section, start: "top top", end: "+=2000%",
+      trigger: section, start: "top top", end: "+=2400%",
       pin: true, pinSpacing: true, anticipatePin: 1,
       scrub: 1, animation: scrollTl,
       invalidateOnRefresh: true,
@@ -757,6 +829,9 @@ export default function IntroScene() {
       <div ref={collageRef} className="intro__collage">
         <ImageCollage />
       </div>
+
+      {/* Brand ecosystem — Scene 10 */}
+      <BrandEcosystem ref={brandEcoRef} />
 
       <NavOrbit />
       <div className="sr-only">Exicon Group — Powered by Possibilities.</div>

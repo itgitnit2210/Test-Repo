@@ -656,6 +656,87 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   }
 }
 
+/* ============================================
+   BRAND ECOSYSTEM (Scene 10)
+   ============================================ */
+.brand-eco {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.brand-eco__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-eco__label {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.brand-eco__logo-img {
+  height: clamp(24px, 3.5vw, 44px);
+  width: auto;
+  display: block;
+  filter: brightness(1);
+  transition: filter 0.3s ease;
+}
+
+.brand-eco__services {
+  position: absolute;
+  bottom: clamp(16px, 3vh, 40px);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(9px, 1vw, 13px);
+  color: #808285;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+/* ── Scene 10 responsive ── */
+@media (max-width: 1024px) {
+  .brand-eco__logo-img {
+    height: clamp(20px, 3vw, 36px);
+  }
+  .brand-eco__services {
+    font-size: clamp(8px, 1.2vw, 11px);
+    letter-spacing: 0.15em;
+  }
+}
+
+@media (max-width: 768px) {
+  .brand-eco__logo-img {
+    height: clamp(18px, 4vw, 30px);
+  }
+  .brand-eco__services {
+    font-size: clamp(7px, 1.5vw, 10px);
+    letter-spacing: 0.1em;
+    white-space: normal;
+    max-width: 90vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-eco__logo-img {
+    height: clamp(16px, 5vw, 24px);
+  }
+  .brand-eco__services {
+    font-size: 7px;
+    letter-spacing: 0.08em;
+  }
+}
+
 /* ---- ACCESSIBILITY ---- */
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after {
