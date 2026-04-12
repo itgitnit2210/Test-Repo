@@ -8,7 +8,7 @@ import LogoOutline from "./LogoOutline";
 import LogoSolid from "./LogoSolid";
 import NavOrbit from "./NavOrbit";
 import ImageCollage from "./ImageCollage";
-import BrandEcosystem from "./BrandEcosystem";
+import BrandEcosystem, { ECO_CX, ECO_CY } from "./BrandEcosystem";
 
 const CYCLING_WORDS = [
   "POSSIBILITIES",
@@ -605,7 +605,7 @@ export default function IntroScene() {
     // 10c. Draw rings on with stagger
     const ecoRings = brandEco.querySelectorAll("[data-eco-ring]");
     ecoRings.forEach((ring) => {
-      const el = ring as SVGCircleElement;
+      const el = ring as SVGEllipseElement;
       const len = el.getTotalLength();
       gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
     });
@@ -639,20 +639,114 @@ export default function IntroScene() {
       opacity: 1, y: 0, duration: 0.03, stagger: 0.02, ease: "back.out(1.3)",
     }, s10Start + 0.14);
 
-    // 10g. Fade in services tagline
-    const ecoServices = brandEco.querySelector("[data-eco-services]");
-    if (ecoServices) {
-      gsap.set(ecoServices, { opacity: 0, y: 15 });
-      scrollTl.to(ecoServices, {
-        opacity: 1, y: 0, duration: 0.04, ease: "power2.out",
-      }, s10Start + 0.18);
+    // Hold: brand ecosystem fully visible
+    scrollTl.set({}, {}, s10Start + 0.22);
+
+    // ══════════════════════════════════════════════
+    // Scene 11: Consulting detail — circles morph to
+    // tilted ellipses, 3 brands fade out, consulting
+    // detail panel appears on right
+    // ══════════════════════════════════════════════
+    const s11Start = s10Start + 0.22;
+
+    // Scene 11 target values
+    const S11_RY_RATIO = 0.62; // circles squash to ellipses
+    const S11_RX_SCALE = 1.35; // scale up rx so orbits are bigger
+    const S11_TILT = -15;      // rotation for 3D perspective
+
+    // 11a. Fade out non-consulting brands (dots + connectors + labels)
+    const otherBrands = brandEco.querySelectorAll("[data-brand-name]:not([data-brand-name='consulting'])");
+    const otherLabels = brandEco.querySelectorAll("[data-label-name]:not([data-label-name='consulting'])");
+
+    scrollTl.to(otherBrands, {
+      opacity: 0, duration: 0.04, stagger: 0.01, ease: "power2.in",
+    }, s11Start);
+    scrollTl.to(otherLabels, {
+      opacity: 0, duration: 0.04, stagger: 0.01, ease: "power2.in",
+    }, s11Start);
+
+    // 11b. Fade out center logo
+    if (ecoLogo) {
+      scrollTl.to(ecoLogo, {
+        opacity: 0, duration: 0.04, ease: "power2.in",
+      }, s11Start);
     }
 
-    // Hold: brand ecosystem fully visible
-    scrollTl.set({}, {}, s10Start + 0.30);
+    // 11c. Fade out consulting brand dot group (it'll reappear as part of the detail)
+    const consultingBrand = brandEco.querySelector("[data-brand-name='consulting']");
+    const consultingLabel = brandEco.querySelector("[data-label-name='consulting']");
+    if (consultingBrand) {
+      scrollTl.to(consultingBrand, {
+        opacity: 0, duration: 0.04, ease: "power2.in",
+      }, s11Start + 0.02);
+    }
+    if (consultingLabel) {
+      scrollTl.to(consultingLabel, {
+        opacity: 0, duration: 0.04, ease: "power2.in",
+      }, s11Start + 0.02);
+    }
+
+    // 11d. Morph orbits: circles → tilted ellipses shifted left
+    //      Keep cx at 480 (avoids SVG viewBox clipping).
+    //      Use CSS transform on the orbit group to shift left + tilt.
+    //      Animate ry to squash circles into ellipses, rx to scale up.
+    const orbitGroup = brandEco.querySelector("[data-eco-orbit-group]");
+    const S11_SHIFT_X = -500;  // px shift in SVG units — half off-screen
+
+    ecoRings.forEach((ring) => {
+      const el = ring as SVGEllipseElement;
+      const originalR = Number(el.getAttribute("data-ring-r") || el.getAttribute("ry"));
+      scrollTl.to(el, {
+        attr: {
+          rx: originalR * S11_RX_SCALE,
+          ry: originalR * S11_RY_RATIO,
+        },
+        duration: 0.10,
+        ease: "power2.inOut",
+      }, s11Start + 0.02);
+    });
+
+    // 11e. Shift left + tilt the orbit group via CSS transform
+    if (orbitGroup) {
+      gsap.set(orbitGroup, { transformOrigin: `${ECO_CX}px ${ECO_CY}px` });
+      scrollTl.to(orbitGroup, {
+        x: S11_SHIFT_X,
+        rotation: S11_TILT,
+        duration: 0.10,
+        ease: "power2.inOut",
+      }, s11Start + 0.02);
+    }
+
+    // 11f. Show consulting detail panel
+    const consultingPanel = brandEco.querySelector("[data-eco-consulting]") as HTMLElement;
+    const consultingLogo = brandEco.querySelector("[data-eco-consulting-logo]") as HTMLElement;
+    const serviceItems = brandEco.querySelectorAll("[data-eco-service]");
+
+    if (consultingPanel) {
+      scrollTl.to(consultingPanel, {
+        opacity: 1, duration: 0.04, ease: "power2.out",
+      }, s11Start + 0.10);
+    }
+
+    // 11g. Consulting logo slides in
+    if (consultingLogo) {
+      gsap.set(consultingLogo, { opacity: 0, x: -30 });
+      scrollTl.to(consultingLogo, {
+        opacity: 1, x: 0, duration: 0.05, ease: "power2.out",
+      }, s11Start + 0.12);
+    }
+
+    // 11h. Service items stagger in
+    serviceItems.forEach((item) => gsap.set(item, { opacity: 0, y: 12 }));
+    scrollTl.to(serviceItems, {
+      opacity: 1, y: 0, duration: 0.03, stagger: 0.015, ease: "power2.out",
+    }, s11Start + 0.14);
+
+    // Hold: consulting detail fully visible
+    scrollTl.set({}, {}, s11Start + 0.30);
 
     const st = ScrollTrigger.create({
-      trigger: section, start: "top top", end: "+=2400%",
+      trigger: section, start: "top top", end: "+=2800%",
       pin: true, pinSpacing: true, anticipatePin: 1,
       scrub: 1, animation: scrollTl,
       invalidateOnRefresh: true,

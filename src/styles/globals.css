@@ -665,6 +665,7 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   z-index: 6;
   opacity: 0;
   pointer-events: none;
+  overflow: visible;
 }
 
 .brand-eco__svg {
@@ -672,6 +673,7 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   inset: 0;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
 .brand-eco__label {
@@ -688,30 +690,80 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   transition: filter 0.3s ease;
 }
 
-.brand-eco__services {
+/* ============================================
+   BRAND ECOSYSTEM — Scene 11 (Consulting detail)
+   ============================================ */
+.brand-eco__consulting {
   position: absolute;
-  bottom: clamp(16px, 3vh, 40px);
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  font-family: var(--font-body);
-  font-weight: 300;
-  font-size: clamp(9px, 1vw, 13px);
-  color: #808285;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  top: 50%;
+  right: clamp(60px, 12vw, 200px);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.8vw, 24px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.brand-eco__consulting-logo {
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.2vw, 18px);
+}
+
+/* Gray dot that sits on the orbit */
+.brand-eco__consulting-dot {
+  width: clamp(18px, 2.5vw, 32px);
+  height: clamp(18px, 2.5vw, 32px);
+  border-radius: 50%;
+  background: #a7a9ac;
+  flex-shrink: 0;
+}
+
+.brand-eco__consulting-img {
+  height: clamp(36px, 5.5vw, 72px);
+  width: auto;
+  display: block;
+}
+
+.brand-eco__services-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-eco__service-item {
   opacity: 0;
 }
 
-/* ── Scene 10 responsive ── */
+.brand-eco__service-text {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(14px, 1.8vw, 26px);
+  color: #fff;
+  line-height: 1.3;
+  padding: clamp(6px, 0.8vw, 12px) 0;
+}
+
+.brand-eco__service-line {
+  display: block;
+  width: clamp(180px, 22vw, 320px);
+}
+
+/* ── Scene 10 + 11 responsive ── */
 @media (max-width: 1024px) {
   .brand-eco__logo-img {
     height: clamp(20px, 3vw, 36px);
   }
-  .brand-eco__services {
-    font-size: clamp(8px, 1.2vw, 11px);
-    letter-spacing: 0.15em;
+  .brand-eco__consulting {
+    right: clamp(30px, 6vw, 80px);
+  }
+  .brand-eco__consulting-img {
+    height: clamp(30px, 5vw, 56px);
+  }
+  .brand-eco__service-text {
+    font-size: clamp(12px, 1.6vw, 20px);
   }
 }
 
@@ -719,11 +771,17 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   .brand-eco__logo-img {
     height: clamp(18px, 4vw, 30px);
   }
-  .brand-eco__services {
-    font-size: clamp(7px, 1.5vw, 10px);
-    letter-spacing: 0.1em;
-    white-space: normal;
-    max-width: 90vw;
+  .brand-eco__consulting {
+    right: clamp(20px, 4vw, 50px);
+  }
+  .brand-eco__consulting-img {
+    height: clamp(26px, 5vw, 44px);
+  }
+  .brand-eco__service-text {
+    font-size: clamp(11px, 2vw, 16px);
+  }
+  .brand-eco__service-line {
+    width: clamp(140px, 30vw, 240px);
   }
 }
 
@@ -731,9 +789,23 @@ body { font-family:var(--font-body); color:#fff; background:#000; overflow-x:hid
   .brand-eco__logo-img {
     height: clamp(16px, 5vw, 24px);
   }
-  .brand-eco__services {
-    font-size: 7px;
-    letter-spacing: 0.08em;
+  .brand-eco__consulting {
+    right: 16px;
+    gap: 10px;
+  }
+  .brand-eco__consulting-img {
+    height: clamp(22px, 7vw, 36px);
+  }
+  .brand-eco__service-text {
+    font-size: 11px;
+    padding: 5px 0;
+  }
+  .brand-eco__service-line {
+    width: clamp(120px, 45vw, 180px);
+  }
+  .brand-eco__consulting-dot {
+    width: 14px;
+    height: 14px;
   }
 }
 

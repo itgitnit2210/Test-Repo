@@ -1,23 +1,22 @@
 "use client";
 
 import { forwardRef } from "react";
-import LogoSolid from "./LogoSolid";
 
 /**
- * BrandEcosystem — Scene 10
+ * BrandEcosystem — Scene 10 + Scene 11 (Consulting detail)
  *
- * Concentric orbit rings with the Exicon logo at center
- * and 4 sub-brand logos positioned on the 4th ring.
+ * Scene 10: Concentric circular orbits (ellipses with rx===ry),
+ *           Exicon logo at center, 4 sub-brand logos on 4th ring.
  *
- * GSAP drives all animation from IntroScene's scroll timeline.
- * This component just renders the static structure.
+ * Scene 11: GSAP morphs circles → tilted ellipses shifted left,
+ *           fades out 3 brands, shows Consulting detail on right.
  *
- * Brand logos referenced (already in /public):
- *   /consulting.svg
- *   /media-solutions.svg
- *   /contimedia.svg
- *   /printle.svg
- *   /tagline.svg
+ * All animation driven by GSAP from IntroScene's scroll timeline.
+ * This component renders the static structure only.
+ *
+ * Brand logos in /public:
+ *   /consulting.svg, /media-solutions.svg, /contimedia.svg, /printle.svg
+ *   /main_logo.svg (center wordmark)
  */
 
 const BRANDS = [
@@ -27,54 +26,68 @@ const BRANDS = [
   { name: "printle",         src: "/printle.svg",         color: "#5e61a7", angle: 210  },
 ];
 
-const RINGS = [140, 190, 260, 340, 440];
-const CX = 480;
-const CY = 310;
+const CONSULTING_SERVICES = [
+  "Brand Strategy",
+  "Technology Solutions",
+  "PR",
+  "Media",
+  "Activation",
+];
+
+export const RINGS = [140, 190, 260, 340, 440];
+export const ECO_CX = 480;
+export const ECO_CY = 310;
 const BRAND_RING = RINGS[3]; // 4th ring — radius 340
 
 function polar(angleDeg: number, r: number) {
   const rad = (angleDeg * Math.PI) / 180;
-  return { x: CX + r * Math.cos(rad), y: CY + r * Math.sin(rad) };
+  return { x: ECO_CX + r * Math.cos(rad), y: ECO_CY + r * Math.sin(rad) };
 }
 
 const BrandEcosystem = forwardRef<HTMLDivElement, { className?: string }>(
   ({ className }, ref) => (
     <div ref={ref} className={`brand-eco ${className ?? ""}`}>
-      {/* ── SVG: rings + dots + connector lines ── */}
+      {/* ── SVG: orbits + dots + connector lines ── */}
       <svg
         className="brand-eco__svg"
         viewBox="0 0 960 620"
         preserveAspectRatio="xMidYMid meet"
         aria-hidden="true"
       >
-        {/* Concentric rings */}
-        {RINGS.map((r, i) => {
-          const isDashed = i === 1;
-          const isOuterGlow = i === RINGS.length - 1;
-          return (
-            <circle
-              key={`ring-${i}`}
-              data-eco-ring
-              cx={CX}
-              cy={CY}
-              r={r}
-              fill="none"
-              stroke="#404041"
-              strokeWidth={i === 0 || i === 3 ? 1.6 : isOuterGlow ? 0.6 : 1.2}
-              strokeDasharray={isDashed ? "4 8" : undefined}
-              opacity={isOuterGlow ? 0.25 : isDashed ? 0.5 : 0.6}
-            />
-          );
-        })}
+        {/* Orbit group — GSAP will tilt this and shift cx/cy */}
+        <g data-eco-orbit-group>
+          {/* Concentric ellipses — start as circles (rx === ry) */}
+          {RINGS.map((r, i) => {
+            const isDashed = i === 1;
+            const isOuterGlow = i === RINGS.length - 1;
+            return (
+              <ellipse
+                key={`ring-${i}`}
+                data-eco-ring
+                data-ring-r={r}
+                cx={ECO_CX}
+                cy={ECO_CY}
+                rx={r}
+                ry={r}
+                fill="none"
+                stroke="#404041"
+                strokeWidth={i === 0 || i === 3 ? 1.6 : isOuterGlow ? 0.6 : 1.2}
+                strokeDasharray={isDashed ? "4 8" : undefined}
+                opacity={isOuterGlow ? 0.25 : isDashed ? 0.5 : 0.6}
+              />
+            );
+          })}
+        </g>
 
         {/* Brand dots + connector lines on the 4th ring */}
         {BRANDS.map((b) => {
           const p = polar(b.angle, BRAND_RING);
           return (
-            <g key={b.name} data-eco-brand>
+            <g key={b.name} data-eco-brand data-brand-name={b.name}>
               {/* Thin connector line from center */}
               <line
-                x1={CX} y1={CY} x2={p.x} y2={p.y}
+                data-eco-connector
+                x1={ECO_CX} y1={ECO_CY} x2={p.x} y2={p.y}
                 stroke={b.color} strokeWidth={0.5} opacity={0.2}
               />
               {/* Outer glow ring */}
@@ -87,38 +100,23 @@ const BrandEcosystem = forwardRef<HTMLDivElement, { className?: string }>(
           );
         })}
 
-        {/* Center logo — same SVG coordinate space */}
+        {/* Center logo — uses /main_logo.svg */}
         <g data-eco-logo>
-          <g transform={`translate(${CX}, ${CY - 10}) scale(0.12)`}>
-            <g transform="translate(-441.26, -250.77)">
-              <path
-                d="M631.04,0c-137.88,0-250.06,112.18-250.06,250.06,0,36.17-14.6,68.92-38.3,92.62-23.7,23.7-56.45,38.36-92.62,38.36-72.34,0-130.98-58.64-130.98-130.98s58.64-130.98,130.98-130.98c29.01,0,55.8,9.45,77.51,25.41l71.99-94.76C357.83,18.51,306.06,0,250.06,0,112.18,0,0,112.18,0,250.06s112.18,250.06,250.06,250.06c68.94,0,131.46-28.04,176.74-73.32,4.79-4.79,9.37-9.78,13.75-14.94,45.9,53.96,114.26,88.26,190.49,88.26,137.88,0,250.06-112.18,250.06-250.06S768.93,0,631.04,0ZM631.04,381.04c-72.34,0-130.98-58.64-130.98-130.98s58.64-130.98,130.98-130.98,130.98,58.64,130.98,130.98-58.64,130.98-130.98,130.98Z"
-                fill="#fff"
-              />
-            </g>
-          </g>
-          {/* Tagline */}
-          <text
-            x={CX} y={CY + 30}
-            textAnchor="middle"
-            fill="#c3884f"
-            fontSize="9"
-            fontFamily="var(--font-body)"
-            fontWeight="300"
-            letterSpacing="3"
-          >
-            POWERED BY POSSIBILITIES
-          </text>
+          <image
+            href="/main_logo.svg"
+            x={ECO_CX - 120}
+            y={ECO_CY - 45}
+            width={240}
+            height={92}
+          />
         </g>
       </svg>
 
       {/* ── Brand logo images — positioned via CSS matching SVG coordinates ── */}
       {BRANDS.map((b) => {
         const p = polar(b.angle, BRAND_RING);
-        // Convert SVG coords to % of viewBox
         const leftPct = (p.x / 960) * 100;
         const topPct  = (p.y / 620) * 100;
-        // Place label outside the dot based on angle quadrant
         const isRight = b.angle > -90 && b.angle < 90;
         const isTop   = b.angle < 0 || b.angle > 180;
 
@@ -126,6 +124,7 @@ const BrandEcosystem = forwardRef<HTMLDivElement, { className?: string }>(
           <div
             key={b.name}
             data-eco-label
+            data-label-name={b.name}
             className="brand-eco__label"
             style={{
               left: `${leftPct}%`,
@@ -144,9 +143,38 @@ const BrandEcosystem = forwardRef<HTMLDivElement, { className?: string }>(
         );
       })}
 
-      {/* Bottom service tagline */}
-      <div className="brand-eco__services" data-eco-services>
-        Healthcare Consulting &bull; Media Solutions &bull; Events &bull; Exhibitions &bull; Conferences
+      {/* ── Scene 11: Consulting detail — right side ── */}
+      <div className="brand-eco__consulting" data-eco-consulting>
+        {/* Consulting logo */}
+        <div className="brand-eco__consulting-logo" data-eco-consulting-logo>
+          {/* Gray dot — sits on the orbit visually */}
+          <div className="brand-eco__consulting-dot" aria-hidden="true" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/consulting.svg"
+            alt="Exicon Consulting"
+            className="brand-eco__consulting-img"
+            draggable={false}
+          />
+        </div>
+
+        {/* Service list */}
+        <div className="brand-eco__services-list">
+          {CONSULTING_SERVICES.map((service, i) => (
+            <div key={service} data-eco-service className="brand-eco__service-item">
+              <span className="brand-eco__service-text">{service}</span>
+              {i < CONSULTING_SERVICES.length - 1 && (
+                <svg className="brand-eco__service-line" height="1" aria-hidden="true">
+                  <line
+                    x1="0" y1="0.5" x2="100%" y2="0.5"
+                    stroke="#565656" strokeWidth="1.5"
+                    strokeDasharray="3.5 3.5" strokeLinecap="round"
+                  />
+                </svg>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
